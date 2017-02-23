@@ -20,11 +20,10 @@ trait AnnotationProperties
      *
      * @return array
      */
-    public function getProperties()
+    public function getProperties(): array
     {
         if (empty($this->properties)) {
-            $a = $this->getDocBlockProperties();
-            $this->properties = $a;
+            $this->properties = $this->getDocBlockProperties();
         }
         return $this->properties;
     }
@@ -34,7 +33,7 @@ trait AnnotationProperties
      *
      * @return array
      */
-    protected function getDocBlockProperties()
+    protected function getDocBlockProperties(): array
     {
         $properties = [];
 
@@ -49,9 +48,14 @@ trait AnnotationProperties
         $reflections = array_reverse($reflections);
 
         foreach ($reflections as $reflection) {
-            $docblock = $factory->create($reflection);
-            foreach ($docblock->getTagsByName('property') as $property) {
-                $properties[$property->getVariableName()] = (string) $property->getType();
+            try {
+                $docblock = $factory->create($reflection);
+                foreach ($docblock->getTagsByName('property') as $property) {
+                    $properties[$property->getVariableName()] = (string) $property->getType();
+                }
+            } catch (\InvalidArgumentException $e) {
+                // Ignore classes with invalid or missing docblocks.
+                continue;
             }
         }
 

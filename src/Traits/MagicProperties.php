@@ -32,7 +32,7 @@ trait MagicProperties
      *
      * @return array
      */
-    public function getProperties()
+    public function getProperties(): array
     {
         return $this->properties;
     }
