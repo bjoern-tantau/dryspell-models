@@ -1,4 +1,12 @@
 {
+    "name": "bjoern-tantau/Tantau",
+    "description": "PHP models framework, using annotations to add typed properties.",
+    "authors": [
+        {
+            "name": "Björn Tantau",
+            "email": "bjoern@bjoern-tantau.de"
+        }
+    ],
     "autoload": {
         "psr-4": {
             "Tantau\\": "src/"
