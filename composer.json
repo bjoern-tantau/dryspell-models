@@ -17,6 +17,7 @@
     },
     "require": {
         "illuminate/support": "^v5.4.9-stable",
-        "phpdocumentor/reflection-docblock": "^3.1.0-stable"
+        "phpdocumentor/reflection-docblock": "^3.1.0-stable",
+        "doctrine/dbal": "^v2.5.12-stable"
     }
 }

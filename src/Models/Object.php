@@ -7,7 +7,9 @@ namespace Tantau\Models;
  *
  * @author Björn Tantau <bjoern.tantau@limora.com>
  *
- * @property int $id
+ * @property int $id Identifier
+ *                   @autoincrement
+ *                   @unsigned
  * @property \DateTime $created_at Time and date of creation.
  * @property \DateTime $updated_at Time and date of last update.
  */
@@ -55,7 +57,7 @@ abstract class Object implements ObjectInterface
      * Array searches for the given property key with the given value.
      * @return Object[]
      */
-    public function find($term): iterable
+    public function find($term): \Iterator
     {
         $data = $this->backend->find($this, $term);
         foreach ($data as $values) {

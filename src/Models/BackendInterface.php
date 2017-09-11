@@ -12,6 +12,14 @@ interface BackendInterface
 {
 
     /**
+     * Setup a database or file if necessary.
+     *
+     * @param \Tantau\Models\ObjectInterface $object
+     * @return BackendInterface
+     */
+    public function setup(ObjectInterface $object): self;
+
+    /**
      * Save the data in the given object to a file or database.
      *
      * @param \Tantau\Models\ObjectInterface $object
@@ -27,5 +35,5 @@ interface BackendInterface
      * Array searches for the given property key with the given value.
      * @return iterable
      */
-    public function find(ObjectInterface $object, $term): iterable;
+    public function find(ObjectInterface $object, $term): \Iterator;
 }

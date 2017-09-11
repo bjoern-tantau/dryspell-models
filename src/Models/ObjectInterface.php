@@ -13,6 +13,7 @@ interface ObjectInterface
 
     /**
      * Get properties of object.
+     * Alongside options of said properties.
      *
      * @return array
      */
@@ -47,7 +48,7 @@ interface ObjectInterface
      * Array searches for the given property key with the given value.
      * @return ObjectInterface[]
      */
-    public function find($term): iterable;
+    public function find($term): \Iterator;
 
     /**
      * Find one instance of the object with the given criteria.
