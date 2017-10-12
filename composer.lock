@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "fa3df5975214169da31dbc16e0ad56c6",
-    "content-hash": "1dee8d6da849c5f3b04f5c5a1cf6f1e4",
+    "hash": "50f3d885f88a6df4d9703fe0fe88d599",
+    "content-hash": "cb047212ccdd8d3bcbc3af50af78ae2b",
     "packages": [
         {
             "name": "doctrine/annotations",
@@ -828,6 +828,46 @@
                 "service proxies"
             ],
             "time": "2017-05-04 11:12:50"
+        },
+        {
+            "name": "offworks/classgen",
+            "version": "v1.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/offworks/classgen.git",
+                "reference": "fa841bae8eeaf79c5f43d7c48a28be2d93a905e0"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/offworks/classgen/zipball/fa841bae8eeaf79c5f43d7c48a28be2d93a905e0",
+                "reference": "fa841bae8eeaf79c5f43d7c48a28be2d93a905e0",
+                "shasum": ""
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Classgen\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Ahmad Rahimie Ahmad Zailani",
+                    "email": "newrehmi@gmail.com",
+                    "role": "lead"
+                }
+            ],
+            "description": "A simple, dynamic and programmatically fluent PHP class generator.",
+            "keywords": [
+                "class",
+                "php",
+                "php class generator",
+                "stub"
+            ],
+            "time": "2016-11-12 04:44:49"
         },
         {
             "name": "phpdocumentor/reflection-common",
@@ -1731,46 +1771,6 @@
                 "object graph"
             ],
             "time": "2017-04-12 18:52:22"
-        },
-        {
-            "name": "offworks/classgen",
-            "version": "v1.0.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/offworks/classgen.git",
-                "reference": "fa841bae8eeaf79c5f43d7c48a28be2d93a905e0"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/offworks/classgen/zipball/fa841bae8eeaf79c5f43d7c48a28be2d93a905e0",
-                "reference": "fa841bae8eeaf79c5f43d7c48a28be2d93a905e0",
-                "shasum": ""
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "Classgen\\": "src"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Ahmad Rahimie Ahmad Zailani",
-                    "email": "newrehmi@gmail.com",
-                    "role": "lead"
-                }
-            ],
-            "description": "A simple, dynamic and programmatically fluent PHP class generator.",
-            "keywords": [
-                "class",
-                "php",
-                "php class generator",
-                "stub"
-            ],
-            "time": "2016-11-12 04:44:49"
         },
         {
             "name": "phar-io/manifest",
