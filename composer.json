@@ -20,7 +20,7 @@
     "require": {
         "php": ">=7.1",
         "illuminate/support": "^v5.4.9-stable",
-        "phpdocumentor/reflection-docblock": "^3.1.0-stable",
+        "phpdocumentor/reflection-docblock": "^4",
         "doctrine/dbal": "^v2.5.12-stable",
         "rtlopez/decimal": "^1.0",
         "doctrine/migrations": "^1.5"
