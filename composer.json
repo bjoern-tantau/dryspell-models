@@ -1,5 +1,5 @@
 {
-    "name": "bjoern-tantau/Tantau",
+    "name": "Dryspell/models",
     "description": "PHP models framework, using annotations to add typed properties.",
     "authors": [
         {
@@ -9,7 +9,7 @@
     ],
     "autoload": {
         "psr-4": {
-            "Tantau\\": "src/"
+            "Dryspell\\": "src/"
         }
     },
     "require-dev": {

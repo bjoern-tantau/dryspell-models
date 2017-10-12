@@ -1,6 +1,6 @@
 <?php
 
-namespace Tantau\Migrations;
+namespace Dryspell\Migrations;
 
 /**
  * Helper to generate a migration file

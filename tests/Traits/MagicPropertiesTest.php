@@ -1,8 +1,8 @@
 <?php
 
-namespace Tantau\Tests\Traits;
+namespace Dryspell\Tests\Traits;
 
-use \Tantau\Traits\MagicProperties;
+use \Dryspell\Traits\MagicProperties;
 use \PHPunit\Framework\TestCase;
 
 /**
@@ -39,7 +39,7 @@ class MagicPropertiesTest extends TestCase
     public function testSetPropertyThrowsUndeclaredPropertyException()
     {
         $mock = $this->getMockForTrait(MagicProperties::class);
-        $this->expectException(\Tantau\UndefinedPropertyException::class);
+        $this->expectException(\Dryspell\UndefinedPropertyException::class);
         $mock->foo = 'bar';
     }
 
@@ -62,7 +62,7 @@ class MagicPropertiesTest extends TestCase
         $properties->setAccessible(true);
         $properties->setValue($mock, ['foo' => ['type' => $type]]);
 
-        $this->expectException(\Tantau\InvalidTypeException::class);
+        $this->expectException(\Dryspell\InvalidTypeException::class);
         $this->expectExceptionMessageRegExp('/::foo must be of type ' . preg_quote($type) . ', ' . preg_quote($givenType) . ' given.$/');
         $mock->foo = $value;
     }
@@ -161,7 +161,7 @@ class MagicPropertiesTest extends TestCase
     public function testGetPropertyThrowsUndeclaredPropertyException()
     {
         $mock = $this->getMockForTrait(MagicProperties::class);
-        $this->expectException(\Tantau\UndefinedPropertyException::class);
+        $this->expectException(\Dryspell\UndefinedPropertyException::class);
         $actual = $mock->foo;
     }
 

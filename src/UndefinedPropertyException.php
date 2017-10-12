@@ -1,5 +1,5 @@
 <?php
-namespace Tantau;
+namespace Dryspell;
 
 /**
  * Thrown when trying to set an undeclared property.

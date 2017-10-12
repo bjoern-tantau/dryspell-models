@@ -1,9 +1,9 @@
 <?php
 
-namespace Tantau\Traits;
+namespace Dryspell\Traits;
 
-use Tantau\InvalidTypeException;
-use Tantau\UndefinedPropertyException;
+use Dryspell\InvalidTypeException;
+use Dryspell\UndefinedPropertyException;
 use phpDocumentor\Reflection\DocBlock\Tags\Property;
 
 /**

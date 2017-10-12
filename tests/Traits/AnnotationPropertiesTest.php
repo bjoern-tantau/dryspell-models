@@ -1,8 +1,8 @@
 <?php
 
-namespace Tantau\Tests\Traits;
+namespace Dryspell\Tests\Traits;
 
-use \Tantau\Traits\AnnotationProperties;
+use \Dryspell\Traits\AnnotationProperties;
 use \PHPunit\Framework\TestCase;
 
 /**
@@ -52,7 +52,7 @@ class AnnotationPropertiesTest extends TestCase
                 'type' => 'string',
             ],
             'baz' => [
-                'type' => '\Tantau\Tests\Traits\AnnotationPropertiesTestClass',
+                'type' => '\Dryspell\Tests\Traits\AnnotationPropertiesTestClass',
             ],
         ];
         $actual = $object->getProperties();
@@ -79,7 +79,7 @@ class AnnotationPropertiesTestClass
  *
  * @author Björn Tantau <bjoern@bjoern-tantau.de>
  *
- * @property \Tantau\Tests\Traits\AnnotationPropertiesTestClass $baz Baz property.
+ * @property \Dryspell\Tests\Traits\AnnotationPropertiesTestClass $baz Baz property.
  * @property string $bar Bar property, this time as string.
  */
 class AnnotationPropertiesTestClassChild extends AnnotationPropertiesTestClass

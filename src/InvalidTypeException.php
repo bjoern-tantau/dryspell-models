@@ -1,6 +1,6 @@
 <?php
 
-namespace Tantau;
+namespace Dryspell;
 
 /**
  * Thrown when an invalid type is given.

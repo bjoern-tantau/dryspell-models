@@ -1,6 +1,6 @@
 <?php
 
-namespace Tantau;
+namespace Dryspell;
 
 /**
  * General Exception Interface

@@ -1,6 +1,6 @@
 <?php
 
-namespace Tantau\Models\Backends;
+namespace Dryspell\Models\Backends;
 
 use Classgen\Stub\ClassStub;
 use DateTime;
@@ -10,10 +10,10 @@ use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Schema\SchemaDiff;
 use ReflectionClass;
 use RtLopez\Decimal;
-use Tantau\Doctrine\AgnosticSchemaDiff;
-use Tantau\InvalidTypeException;
-use Tantau\Models\BackendInterface;
-use Tantau\Models\ObjectInterface;
+use Dryspell\Doctrine\AgnosticSchemaDiff;
+use Dryspell\InvalidTypeException;
+use Dryspell\Models\BackendInterface;
+use Dryspell\Models\ObjectInterface;
 use function snake_case;
 
 /**

@@ -1,6 +1,6 @@
 <?php
 
-namespace Tantau\Tests\Models\Backends;
+namespace Dryspell\Tests\Models\Backends;
 
 use Classgen\Stub\ClassStub;
 use Doctrine\DBAL\Connection;
@@ -9,8 +9,8 @@ use Doctrine\DBAL\DriverManager;
 use Doctrine\DBAL\Types\Type;
 use PHPunit\Framework\TestCase;
 use RtLopez\Decimal;
-use Tantau\Models\Backends\Doctrine;
-use Tantau\Models\Object;
+use Dryspell\Models\Backends\Doctrine;
+use Dryspell\Models\Object;
 
 /**
  * Tests for doctrine based backend model
@@ -258,7 +258,7 @@ class DoctrineTest extends TestCase
      * Is an exception thrown when trying to update a deleted object?
      *
      * @test
-     * @expectedException \Tantau\Models\Backends\Exception
+     * @expectedException \Dryspell\Models\Backends\Exception
      * @expectedExceptionCode 1
      */
     public function testSaveSeeminglyExisting()

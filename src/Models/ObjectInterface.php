@@ -1,6 +1,6 @@
 <?php
 
-namespace Tantau\Models;
+namespace Dryspell\Models;
 
 /**
  * Generic Interface for objects

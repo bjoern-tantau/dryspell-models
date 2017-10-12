@@ -1,6 +1,6 @@
 <?php
 
-namespace Tantau\Tests\Doctrine;
+namespace Dryspell\Tests\Doctrine;
 
 use Doctrine\DBAL\Schema\Column;
 use Doctrine\DBAL\Schema\ColumnDiff;
@@ -11,7 +11,7 @@ use Doctrine\DBAL\Schema\Table;
 use Doctrine\DBAL\Schema\TableDiff;
 use Doctrine\DBAL\Types\Type;
 use PHPUnit\Framework\TestCase;
-use Tantau\Doctrine\AgnosticSchemaDiff;
+use Dryspell\Doctrine\AgnosticSchemaDiff;
 
 /**
  * Tests for base model object
@@ -142,7 +142,7 @@ class AgnosticSchemaDiffTest extends TestCase
         $a_diff = new AgnosticSchemaDiff($diff);
         $actual = $a_diff->getUpCommands();
         $expected = [
-            'throw new \\Tantau\\Migrations\\Exception(\'Dropping a table will lead to data loss. Migrate your data and remove this exception.\');',
+            'throw new \\Dryspell\\Migrations\\Exception(\'Dropping a table will lead to data loss. Migrate your data and remove this exception.\');',
             '$schema->dropTable(\'local_table\');',
         ];
         $this->assertEquals($expected, $actual);
@@ -184,7 +184,7 @@ class AgnosticSchemaDiffTest extends TestCase
         $actual = $a_diff->getUpCommands();
         $expected = [
             '$table = $schema->getTable(\'table\');',
-            'throw new \\Tantau\\Migrations\\Exception(\'Renaming a table will probably lead to data loss. Use your database engine\\\'s rename query and remove this exception.\');',
+            'throw new \\Dryspell\\Migrations\\Exception(\'Renaming a table will probably lead to data loss. Use your database engine\\\'s rename query and remove this exception.\');',
             '$schema->renameTable(\'table\', \'new_table\');',
             '$table = $schema->getTable(\'new_table\');',
             '$table->addColumn(\'bar\', \'string\', unserialize(\'' . addcslashes(serialize([
@@ -201,9 +201,9 @@ class AgnosticSchemaDiffTest extends TestCase
                 'columnDefinition' => null,
                 'comment'          => null,
                 ]), "\'\\") . '\'));',
-            'throw new \\Tantau\\Migrations\\Exception(\'Dropping a column will lead to data loss. Migrate your data and remove this exception.\');',
+            'throw new \\Dryspell\\Migrations\\Exception(\'Dropping a column will lead to data loss. Migrate your data and remove this exception.\');',
             '$table->dropColumn(\'foobar\');',
-            'throw new \\Tantau\\Migrations\\Exception(\'Changing a column may lead to data loss. Check your changes and remove this exception.\');',
+            'throw new \\Dryspell\\Migrations\\Exception(\'Changing a column may lead to data loss. Check your changes and remove this exception.\');',
             '$table->changeColumn(\'foo\', unserialize(\'' . addcslashes(serialize([
                 'name'             => 'foo',
                 'type'             => Type::getType(Type::STRING),
@@ -218,7 +218,7 @@ class AgnosticSchemaDiffTest extends TestCase
                 'columnDefinition' => null,
                 'comment'          => null,
                 ]), "\'\\") . '\'));',
-            'throw new \\Tantau\\Migrations\\Exception(\'Renaming a column may lead to data loss. Migrate your data and remove this exception.\');',
+            'throw new \\Dryspell\\Migrations\\Exception(\'Renaming a column may lead to data loss. Migrate your data and remove this exception.\');',
             '$table->changeColumn(\'foo\', unserialize(\'' . addcslashes(serialize([
                 'name'             => 'baz',
                 'type'             => Type::getType(Type::STRING),

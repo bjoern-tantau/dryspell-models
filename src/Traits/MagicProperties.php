@@ -1,9 +1,9 @@
 <?php
 
-namespace Tantau\Traits;
+namespace Dryspell\Traits;
 
-use Tantau\InvalidTypeException;
-use Tantau\UndefinedPropertyException;
+use Dryspell\InvalidTypeException;
+use Dryspell\UndefinedPropertyException;
 
 /**
  * Make getters and setters for virtual public properties available.

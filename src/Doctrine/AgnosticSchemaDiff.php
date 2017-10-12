@@ -1,13 +1,13 @@
 <?php
 
-namespace Tantau\Doctrine;
+namespace Dryspell\Doctrine;
 
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Schema\SchemaDiff;
 use Doctrine\DBAL\Schema\Table;
 use Doctrine\DBAL\Schema\TableDiff;
-use Tantau\Migrations\Exception;
-use Tantau\Migrations\GeneratorHelperInterface;
+use Dryspell\Migrations\Exception;
+use Dryspell\Migrations\GeneratorHelperInterface;
 
 /**
  * Get the commands to create a database agnostic schema migration

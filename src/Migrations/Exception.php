@@ -1,6 +1,6 @@
 <?php
 
-namespace Tantau\Migrations;
+namespace Dryspell\Migrations;
 
 /**
  * Exceptions thrown by migrations

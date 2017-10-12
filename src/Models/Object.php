@@ -1,6 +1,6 @@
 <?php
 
-namespace Tantau\Models;
+namespace Dryspell\Models;
 
 /**
  * Abstract object to be used for all models.
@@ -14,7 +14,7 @@ namespace Tantau\Models;
 abstract class Object implements ObjectInterface
 {
 
-    use \Tantau\Traits\AnnotationProperties;
+    use \Dryspell\Traits\AnnotationProperties;
     /** @var string Property to be used as id of object. */
     protected static $id_property = 'id';
 
