@@ -8,7 +8,7 @@ use Tantau\UndefinedPropertyException;
 /**
  * Make getters and setters for virtual public properties available.
  *
- * @author Björn Tantau <bjoern.tantau@limora.com>
+ * @author Björn Tantau <bjoern@bjoern-tantau.de>
  */
 trait MagicProperties
 {
@@ -52,7 +52,7 @@ trait MagicProperties
             throw new UndefinedPropertyException('Access to undeclared property: ' . static::class . '::' . $name);
         }
         if (!is_null($value)) {
-            $type = $properties[$name];
+            $type = $properties[$name]['type'];
             if (!$this->checkType($value, $type)) {
                 throw new InvalidTypeException(static::class . '::' . $name . ' must be of type ' . $type . ', ' . $this->getType($value) . ' given.');
             }

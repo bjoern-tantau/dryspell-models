@@ -1,15 +1,15 @@
 <?php
 
-namespace Tantau;
+namespace Tantau\Migrations;
 
 /**
- * General Exception Interface
+ * Exceptions thrown by migrations
  *
  * @category
  * @package
  * @author Björn Tantau <bjoern@bjoern-tantau.de>
  */
-interface Exception
+class Exception extends \Exception
 {
 
 }

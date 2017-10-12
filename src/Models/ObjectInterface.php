@@ -6,7 +6,7 @@ namespace Tantau\Models;
  * Generic Interface for objects
  * that can be saved in a database or file.
  *
- * @author Björn Tantau <bjoern.tantau@limora.com>
+ * @author Björn Tantau <bjoern@bjoern-tantau.de>
  */
 interface ObjectInterface
 {
@@ -24,7 +24,14 @@ interface ObjectInterface
      *
      * @return string
      */
-    public function getIdProperty(): string;
+    public static function getIdProperty(): string;
+
+    /**
+     * Get all values of the object.
+     *
+     * @return array
+     */
+    public function getValues(): array;
 
     /**
      * Mass-assign values to properties.

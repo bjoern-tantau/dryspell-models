@@ -5,21 +5,18 @@ namespace Tantau\Models;
 /**
  * Abstract object to be used for all models.
  *
- * @author Björn Tantau <bjoern.tantau@limora.com>
+ * @author Björn Tantau <bjoern@bjoern-tantau.de>
  *
- * @property int $id Identifier
- *                   @autoincrement
- *                   @unsigned
- * @property \DateTime $created_at Time and date of creation.
- * @property \DateTime $updated_at Time and date of last update.
+ * @property int $id Identifier @id, @GeneratedValue, @unsigned
+ * @property \DateTime $created_at Time and date of creation. @default(now)
+ * @property \DateTime $updated_at Time and date of last update. @default(now), @OnUpdate(now)
  */
 abstract class Object implements ObjectInterface
 {
 
     use \Tantau\Traits\AnnotationProperties;
-
     /** @var string Property to be used as id of object. */
-    protected $id_property = 'id';
+    protected static $id_property = 'id';
 
     /** @var BackendInterface Data-Managing Backend. */
     private $backend;
@@ -34,9 +31,9 @@ abstract class Object implements ObjectInterface
      *
      * @return string
      */
-    public function getIdProperty(): string
+    public static function getIdProperty(): string
     {
-        return $this->id_property;
+        return static::$id_property;
     }
 
     /**
@@ -83,6 +80,20 @@ abstract class Object implements ObjectInterface
     }
 
     /**
+     * Get all values of the object.
+     *
+     * @return array
+     */
+    public function getValues(): array
+    {
+        $values = [];
+        foreach ($this->getProperties() as $property => $options) {
+            $values[$property] = $this->$property;
+        }
+        return $values;
+    }
+
+    /**
      * Mass-assign values to properties.
      *
      * @param array $values Associative array of properties and their values.
@@ -95,5 +106,4 @@ abstract class Object implements ObjectInterface
         }
         return $this;
     }
-
 }

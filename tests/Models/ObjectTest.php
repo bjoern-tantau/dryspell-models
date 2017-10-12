@@ -9,7 +9,7 @@ use \PHPunit\Framework\TestCase;
  *
  * @category
  * @package
- * @author Björn Tantau <bjoern.tantau@limora.com>
+ * @author Björn Tantau <bjoern@bjoern-tantau.de>
  */
 class ObjectTest extends TestCase
 {
@@ -22,28 +22,24 @@ class ObjectTest extends TestCase
     public function testGetProperties()
     {
         $backend = $this->getMockBuilder(\Tantau\Models\BackendInterface::class)->getMock();
-        $object = $this->getMockForAbstractClass(\Tantau\Models\Object::class, [$backend]);
+        $object = $this->getMockForAbstractClass(\Tantau\Models\Object::class,
+            [$backend]);
         $actual = $object->getProperties();
         $expected = [
             'id'         => [
-                'type'    => 'int',
-                'options' => [
-                    'autoincrement' => true,
-                    'signed'        => false,
-                ],
+                'type'            => 'int',
+                'id'              => true,
+                'generated_value' => true,
+                'unsigned'        => true,
             ],
             'created_at' => [
                 'type'    => '\\DateTime',
-                'options' => [
-                    'default' => 'NOW()',
-                ],
+                'default' => 'now',
             ],
             'updated_at' => [
-                'type'    => '\\DateTime',
-                'options' => [
-                    'default'   => 'NOW()',
-                    'on_update' => 'NOW()',
-                ],
+                'type'      => '\\DateTime',
+                'default'   => 'now',
+                'on_update' => 'now',
             ],
         ];
         $this->assertEquals($expected, $actual);
@@ -57,14 +53,36 @@ class ObjectTest extends TestCase
     public function testGetIdProperty()
     {
         $backend = $this->getMockBuilder(\Tantau\Models\BackendInterface::class)->getMock();
-        $object = $this->getMockForAbstractClass(\Tantau\Models\Object::class, [$backend]);
-        $actual = $object->getIdProperty();
+        $object = $this->getMockForAbstractClass(\Tantau\Models\Object::class,
+            [$backend]);
+        $actual = $object::getIdProperty();
         $expected = 'id';
         $this->assertEquals($expected, $actual);
     }
 
     /**
-     * Are values correctl assigned to properties?
+     * Are values correctly returned?
+     *
+     * @test
+     */
+    public function testGetValues()
+    {
+        $values = [
+            'id'         => 1,
+            'created_at' => new \DateTime('2000-01-01'),
+            'updated_at' => new \DateTime('2000-01-01'),
+        ];
+
+        $backend = $this->getMockBuilder(\Tantau\Models\BackendInterface::class)->getMock();
+        $object = $this->getMockForAbstractClass(\Tantau\Models\Object::class,
+            [$backend]);
+        $object->setValues($values);
+        $actual = $object->getValues();
+        $this->assertEquals($values, $actual);
+    }
+
+    /**
+     * Are values correctly assigned to properties?
      *
      * @test
      */
@@ -77,7 +95,8 @@ class ObjectTest extends TestCase
         ];
 
         $backend = $this->getMockBuilder(\Tantau\Models\BackendInterface::class)->getMock();
-        $object = $this->getMockForAbstractClass(\Tantau\Models\Object::class, [$backend]);
+        $object = $this->getMockForAbstractClass(\Tantau\Models\Object::class,
+            [$backend]);
         $actual = $object->setValues($values);
         $this->assertEquals($object, $actual);
         $this->assertEquals(1, $actual->id);
@@ -95,11 +114,12 @@ class ObjectTest extends TestCase
     public function testSave()
     {
         $backend = $this->getMockBuilder(\Tantau\Models\BackendInterface::class)->getMock();
-        $object = $this->getMockForAbstractClass(\Tantau\Models\Object::class, [$backend]);
+        $object = $this->getMockForAbstractClass(\Tantau\Models\Object::class,
+            [$backend]);
         $backend->expects($this->once())
-                ->method('save')
-                ->with($object)
-                ->will($this->returnSelf());
+            ->method('save')
+            ->with($object)
+            ->will($this->returnSelf());
         $actual = $object->save();
         $expected = $object;
         $this->assertEquals($expected, $actual);
@@ -113,26 +133,27 @@ class ObjectTest extends TestCase
     public function testFind()
     {
         $backend = $this->getMockBuilder(\Tantau\Models\BackendInterface::class)->getMock();
-        $object = $this->getMockForAbstractClass(\Tantau\Models\Object::class, [$backend]);
+        $object = $this->getMockForAbstractClass(\Tantau\Models\Object::class,
+            [$backend]);
         $backend->expects($this->once())
-                ->method('find')
-                ->with($object, ['id' => ['>' => 1]])
-                ->will($this->returnValue([
-                            [
-                                'id'         => 2,
-                                'created_at' => new \DateTime('2000-01-01'),
-                                'updated_at' => new \DateTime('2000-01-01'),
-                            ],
-                            [
-                                'id'         => 3,
-                                'created_at' => new \DateTime('2000-01-01'),
-                                'updated_at' => new \DateTime('2000-01-01'),
-                            ],
-                            [
-                                'id'         => 4,
-                                'created_at' => new \DateTime('2000-01-01'),
-                                'updated_at' => new \DateTime('2000-01-01'),
-                            ],
+            ->method('find')
+            ->with($object, ['id' => ['>' => 1]])
+            ->will($this->returnValue([
+                    [
+                        'id'         => 2,
+                        'created_at' => new \DateTime('2000-01-01'),
+                        'updated_at' => new \DateTime('2000-01-01'),
+                    ],
+                    [
+                        'id'         => 3,
+                        'created_at' => new \DateTime('2000-01-01'),
+                        'updated_at' => new \DateTime('2000-01-01'),
+                    ],
+                    [
+                        'id'         => 4,
+                        'created_at' => new \DateTime('2000-01-01'),
+                        'updated_at' => new \DateTime('2000-01-01'),
+                    ],
         ]));
         $actual = $object->find(['id' => ['>' => 1]]);
         $this->assertInstanceOf(\Generator::class, $actual);
@@ -141,8 +162,10 @@ class ObjectTest extends TestCase
             $this->assertInstanceOf(\Tantau\Models\Object::class, $object);
             $this->assertInstanceOf(\DateTime::class, $object->created_at);
             $this->assertInstanceOf(\DateTime::class, $object->updated_at);
-            $this->assertEquals('2000-01-01', $object->created_at->format('Y-m-d'));
-            $this->assertEquals('2000-01-01', $object->updated_at->format('Y-m-d'));
+            $this->assertEquals('2000-01-01',
+                $object->created_at->format('Y-m-d'));
+            $this->assertEquals('2000-01-01',
+                $object->updated_at->format('Y-m-d'));
             $values[] = $object;
         }
         $this->assertCount(3, $values);
@@ -159,16 +182,17 @@ class ObjectTest extends TestCase
     public function testLoad()
     {
         $backend = $this->getMockBuilder(\Tantau\Models\BackendInterface::class)->getMock();
-        $object = $this->getMockForAbstractClass(\Tantau\Models\Object::class, [$backend]);
+        $object = $this->getMockForAbstractClass(\Tantau\Models\Object::class,
+            [$backend]);
         $backend->expects($this->once())
-                ->method('find')
-                ->with($object, ['id' => 1])
-                ->will($this->returnValue([
-                            [
-                                'id'         => 1,
-                                'created_at' => new \DateTime('2000-01-01'),
-                                'updated_at' => new \DateTime('2000-01-01'),
-                            ],
+            ->method('find')
+            ->with($object, ['id' => 1])
+            ->will($this->returnValue([
+                    [
+                        'id'         => 1,
+                        'created_at' => new \DateTime('2000-01-01'),
+                        'updated_at' => new \DateTime('2000-01-01'),
+                    ],
         ]));
         $actual = $object->load(1);
         $this->assertEquals($object, $actual);
@@ -178,5 +202,4 @@ class ObjectTest extends TestCase
         $this->assertEquals('2000-01-01', $actual->created_at->format('Y-m-d'));
         $this->assertEquals('2000-01-01', $actual->updated_at->format('Y-m-d'));
     }
-
 }

@@ -13,11 +13,16 @@
         }
     },
     "require-dev": {
-        "phpunit/phpunit": "^6.0.6-stable"
+        "phpunit/phpunit": "^6.0.6-stable",
+        "offworks/classgen": "^1.0",
+        "phpunit/phpunit-mock-objects": "^4.0"
     },
     "require": {
+        "php": ">=7.1",
         "illuminate/support": "^v5.4.9-stable",
         "phpdocumentor/reflection-docblock": "^3.1.0-stable",
-        "doctrine/dbal": "^v2.5.12-stable"
+        "doctrine/dbal": "^v2.5.12-stable",
+        "rtlopez/decimal": "^1.0",
+        "doctrine/migrations": "^1.5"
     }
 }

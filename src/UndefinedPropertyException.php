@@ -6,7 +6,7 @@ namespace Tantau;
  *
  * @category
  * @package
- * @author Björn Tantau <bjoern.tantau@limora.com>
+ * @author Björn Tantau <bjoern@bjoern-tantau.de>
  */
 class UndefinedPropertyException extends \LogicException implements Exception
 {

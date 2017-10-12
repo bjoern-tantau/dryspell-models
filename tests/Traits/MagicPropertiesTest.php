@@ -10,7 +10,7 @@ use \PHPunit\Framework\TestCase;
  *
  * @category
  * @package
- * @author Björn Tantau <bjoern.tantau@limora.com>
+ * @author Björn Tantau <bjoern@bjoern-tantau.de>
  */
 class MagicPropertiesTest extends TestCase
 {
@@ -25,7 +25,7 @@ class MagicPropertiesTest extends TestCase
         $mock = $this->getMockForTrait(MagicProperties::class);
         $properties = new \ReflectionProperty($mock, 'properties');
         $properties->setAccessible(true);
-        $expected = ['foo' => 'bar'];
+        $expected = ['foo' => ['type' => 'bar']];
         $properties->setValue($mock, $expected);
         $actual = $mock->getProperties();
         $this->assertEquals($expected, $actual);
@@ -52,13 +52,15 @@ class MagicPropertiesTest extends TestCase
      * @test
      * @dataProvider dataProviderTestSetPropertyThrowsInvalidTypeException
      */
-    public function testSetPropertyThrowsInvalidTypeException(string $type, $value, string $givenType = 'string')
+    public function testSetPropertyThrowsInvalidTypeException(string $type,
+                                                              $value,
+                                                              string $givenType = 'string')
     {
         $mock = $this->getMockForTrait(MagicProperties::class);
 
         $properties = new \ReflectionProperty($mock, 'properties');
         $properties->setAccessible(true);
-        $properties->setValue($mock, ['foo' => $type]);
+        $properties->setValue($mock, ['foo' => ['type' => $type]]);
 
         $this->expectException(\Tantau\InvalidTypeException::class);
         $this->expectExceptionMessageRegExp('/::foo must be of type ' . preg_quote($type) . ', ' . preg_quote($givenType) . ' given.$/');
@@ -99,7 +101,7 @@ class MagicPropertiesTest extends TestCase
 
         $properties = new \ReflectionProperty($mock, 'properties');
         $properties->setAccessible(true);
-        $properties->setValue($mock, ['foo' => $type]);
+        $properties->setValue($mock, ['foo' => ['type' => $type]]);
 
         $mock->foo = $value;
 
@@ -138,14 +140,15 @@ class MagicPropertiesTest extends TestCase
      */
     public function testSetPropertyCallsSetter()
     {
-        $mock = $this->getMockForTrait(MagicProperties::class, [], '', true, true, true, ['setFooBar']);
+        $mock = $this->getMockForTrait(MagicProperties::class, [], '', true,
+            true, true, ['setFooBar']);
         $mock->expects($this->once())
             ->method('setFooBar')
             ->with('baz');
 
         $properties = new \ReflectionProperty($mock, 'properties');
         $properties->setAccessible(true);
-        $properties->setValue($mock, ['foo_bar' => 'string']);
+        $properties->setValue($mock, ['foo_bar' => ['type' => 'string']]);
 
         $mock->foo_bar = 'baz';
     }
@@ -173,7 +176,7 @@ class MagicPropertiesTest extends TestCase
 
         $properties = new \ReflectionProperty($mock, 'properties');
         $properties->setAccessible(true);
-        $properties->setValue($mock, ['foo' => 'string']);
+        $properties->setValue($mock, ['foo' => ['type' => 'string']]);
 
         $values = new \ReflectionProperty($mock, 'values');
         $values->setAccessible(true);
@@ -191,14 +194,15 @@ class MagicPropertiesTest extends TestCase
      */
     public function testGetPropertyCallsGetter()
     {
-        $mock = $this->getMockForTrait(MagicProperties::class, [], '', true, true, true, ['getFooBar']);
+        $mock = $this->getMockForTrait(MagicProperties::class, [], '', true,
+            true, true, ['getFooBar']);
         $mock->expects($this->once())
             ->method('getFooBar')
             ->will($this->returnValue('baz'));
 
         $properties = new \ReflectionProperty($mock, 'properties');
         $properties->setAccessible(true);
-        $properties->setValue($mock, ['foo_bar' => 'string']);
+        $properties->setValue($mock, ['foo_bar' => ['type' => 'string']]);
 
         $actual = $mock->foo_bar;
         $this->assertEquals('baz', $actual);
@@ -215,7 +219,7 @@ class MagicPropertiesTest extends TestCase
 
         $properties = new \ReflectionProperty($mock, 'properties');
         $properties->setAccessible(true);
-        $properties->setValue($mock, ['foo' => 'string', 'bar' => 'string']);
+        $properties->setValue($mock, ['foo' => ['type' => 'string'], 'bar' => ['type' => 'string']]);
 
         $values = new \ReflectionProperty($mock, 'values');
         $values->setAccessible(true);
@@ -241,7 +245,7 @@ class MagicPropertiesTest extends TestCase
 
         $properties = new \ReflectionProperty($mock, 'properties');
         $properties->setAccessible(true);
-        $properties->setValue($mock, ['foo' => 'string']);
+        $properties->setValue($mock, ['foo' => ['type' => 'string']]);
 
         $values = new \ReflectionProperty($mock, 'values');
         $values->setAccessible(true);
@@ -255,5 +259,4 @@ class MagicPropertiesTest extends TestCase
         // Test that no error is thrown:
         unset($mock->bar);
     }
-
 }

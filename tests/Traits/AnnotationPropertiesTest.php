@@ -10,7 +10,7 @@ use \PHPunit\Framework\TestCase;
  *
  * @category
  * @package
- * @author Björn Tantau <bjoern.tantau@limora.com>
+ * @author Björn Tantau <bjoern@bjoern-tantau.de>
  */
 class AnnotationPropertiesTest extends TestCase
 {
@@ -23,36 +23,61 @@ class AnnotationPropertiesTest extends TestCase
     public function testGetProperties()
     {
         $object = new AnnotationPropertiesTestClass();
-        $expected = ['foo' => 'string', 'bar' => 'int'];
+        $expected = [
+            'foo' => [
+                'type'     => 'string',
+                'default'  => 'foobar',
+                'length'   => 255,
+                'required' => true,
+            ],
+            'bar' => [
+                'type'            => 'int',
+                'id'              => true,
+                'generated_value' => true,
+                'unsigned'        => true,
+            ],
+        ];
         $actual = $object->getProperties();
         $this->assertEquals($expected, $actual);
 
         $object = new AnnotationPropertiesTestClassChild();
-        $expected = ['foo' => 'string', 'bar' => 'string', 'baz' => '\Tantau\Tests\Traits\AnnotationPropertiesTestClass'];
+        $expected = [
+            'foo' => [
+                'type'     => 'string',
+                'default'  => 'foobar',
+                'length'   => 255,
+                'required' => true,
+            ],
+            'bar' => [
+                'type' => 'string',
+            ],
+            'baz' => [
+                'type' => '\Tantau\Tests\Traits\AnnotationPropertiesTestClass',
+            ],
+        ];
         $actual = $object->getProperties();
         $this->assertEquals($expected, $actual);
     }
-
 }
 
 /**
  * Description of AnnotationPropertiesTestClass
  *
- * @author Björn Tantau <bjoern.tantau@limora.com>
+ * @author Björn Tantau <bjoern@bjoern-tantau.de>
  *
- * @property string $foo Foo property.
- * @property int $bar Bar property.
+ * @property string $foo Foo property. @default(foobar), @length(255), @required
+ * @property int $bar Bar property. @id, @GeneratedValue, @unsigned
  */
 class AnnotationPropertiesTestClass
 {
 
-    use \Tantau\Traits\AnnotationProperties;
+    use AnnotationProperties;
 }
 
 /**
  * Description of AnnotationPropertiesTestClassChild
  *
- * @author Björn Tantau <bjoern.tantau@limora.com>
+ * @author Björn Tantau <bjoern@bjoern-tantau.de>
  *
  * @property \Tantau\Tests\Traits\AnnotationPropertiesTestClass $baz Baz property.
  * @property string $bar Bar property, this time as string.
