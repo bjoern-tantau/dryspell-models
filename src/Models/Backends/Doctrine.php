@@ -5,15 +5,17 @@ namespace Dryspell\Models\Backends;
 use Classgen\Stub\ClassStub;
 use DateTime;
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Migrations\AbstractMigration;
 use Doctrine\DBAL\Schema\Comparator;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Schema\SchemaDiff;
-use ReflectionClass;
-use RtLopez\Decimal;
 use Dryspell\Doctrine\AgnosticSchemaDiff;
 use Dryspell\InvalidTypeException;
 use Dryspell\Models\BackendInterface;
 use Dryspell\Models\ObjectInterface;
+use PDO;
+use ReflectionClass;
+use RtLopez\Decimal;
 use function snake_case;
 
 /**
@@ -79,7 +81,7 @@ class Doctrine implements BackendInterface
         $diff = $this->getDiff($from_schema, $to_schema);
 
         $a_diff = new AgnosticSchemaDiff($diff);
-        $class->extendsFrom(\Doctrine\DBAL\Migrations\AbstractMigration::class);
+        $class->extendsFrom('\\' . AbstractMigration::class);
         $up = $class->addMethod('up');
         foreach ($a_diff->getUpParameters() as $param) {
             $up->addParameter($param['name'], $param['type'] ?? null);
@@ -198,7 +200,7 @@ class Doctrine implements BackendInterface
         }
         $query->setParameters(array_values($term));
         $stmt = $query->execute();
-        while ($row = $stmt->fetch(\PDO::FETCH_ASSOC)) {
+        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
             $new_object = clone $object;
             $new_object->setValues($row);
             yield $new_object;
@@ -226,7 +228,8 @@ class Doctrine implements BackendInterface
                         [$object->getIdProperty() => $id]);
                     return;
                 }
-                throw new Exception('Object with id ' . $id . ' does not exist anymore.', Exception::NOT_EXISTS);
+                throw new Exception('Object with id ' . $id . ' does not exist anymore.',
+                Exception::NOT_EXISTS);
             }
             $conn->insert($table, $object->getValues());
             $id = $conn->lastInsertId();
