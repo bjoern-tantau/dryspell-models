@@ -59,7 +59,7 @@ class DoctrineTest extends TestCase
                 'parameters' => [
                     [
                         'name' => 'schema',
-                        'type' => '\Doctrine\DBAL\Schema\Schema',
+                        'type' => 'Doctrine\DBAL\Schema\Schema',
                     ],
                 ],
                 'lines'      => [
@@ -85,7 +85,7 @@ class DoctrineTest extends TestCase
                 'parameters' => [
                     [
                         'name' => 'schema',
-                        'type' => '\Doctrine\DBAL\Schema\Schema',
+                        'type' => 'Doctrine\DBAL\Schema\Schema',
                     ],
                 ],
                 'lines'      => [],
@@ -137,7 +137,7 @@ class DoctrineTest extends TestCase
                 'parameters' => [
                     [
                         'name' => 'schema',
-                        'type' => '\Doctrine\DBAL\Schema\Schema',
+                        'type' => 'Doctrine\DBAL\Schema\Schema',
                     ],
                 ],
                 'lines'      => [
@@ -162,7 +162,7 @@ class DoctrineTest extends TestCase
                 'parameters' => [
                     [
                         'name' => 'schema',
-                        'type' => '\Doctrine\DBAL\Schema\Schema',
+                        'type' => 'Doctrine\DBAL\Schema\Schema',
                     ],
                 ],
                 'lines'      => [],

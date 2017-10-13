@@ -32,7 +32,7 @@ class AgnosticSchemaDiff implements GeneratorHelperInterface
         return [
             [
                 'name' => 'schema',
-                'type' => '\\' . Schema::class,
+                'type' => Schema::class,
             ],
         ];
     }
@@ -234,7 +234,7 @@ class AgnosticSchemaDiff implements GeneratorHelperInterface
         return [
             [
                 'name' => 'schema',
-                'type' => '\\' . Schema::class,
+                'type' => Schema::class,
             ],
         ];
     }
