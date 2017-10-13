@@ -281,6 +281,16 @@ class AgnosticSchemaDiff implements GeneratorHelperInterface
         if (is_bool($value)) {
             return $value ? 'true' : 'false';
         }
-        return 'unserialize(\'' . addcslashes(serialize($value), "\'\\") . '\')';
+        if (is_array($value)) {
+            $out = '[';
+            $values = [];
+            foreach ($value as $key => $val) {
+                $values[] = '    ' . $this->serialize($key) . ' => ' . $this->serialize($val);
+            }
+            $out .= join(",\n", $values);
+            $out .= ']';
+            return $out;
+        }
+        return 'unserialize(\'' . addcslashes(serialize($value), '\'\\') . '\')';
     }
 }
