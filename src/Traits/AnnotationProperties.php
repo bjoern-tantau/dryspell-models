@@ -50,7 +50,7 @@ trait AnnotationProperties
 
         $factory = \phpDocumentor\Reflection\DocBlockFactory::createInstance();
 
-        $reflection = new \ReflectionClass($this);
+        $reflection = new \Dryspell\ExtendedReflectionClass($this);
         $reflections = [];
         do {
             $reflections[] = $reflection;
@@ -63,8 +63,18 @@ trait AnnotationProperties
                 $docblock = $factory->create($reflection);
                 foreach ($docblock->getTagsByName('property') as $property) {
                     /* @var $property Property */
+                    $type = (string) $property->getType();
+                    if ($reflection->hasUseStatement($type)) {
+                        $type = '\\' . $reflection->getClassFromUseStatement($type);
+                    } else {
+                        $namespaced_type = '\\' . $reflection->getNamespaceName() . $type;
+                        $reflection->hasUseStatement($type);
+                        if (!starts_with('\\', $type) && class_exists($namespaced_type)) {
+                            $type = $namespaced_type;
+                        }
+                    }
                     $options = [
-                        'type' => (string) $property->getType(),
+                        'type' => $type,
                     ];
                     $options = array_merge($options,
                         $this->getOptions((string) $property->getDescription()));

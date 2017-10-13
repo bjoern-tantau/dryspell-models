@@ -79,7 +79,7 @@ class AnnotationPropertiesTestClass
  *
  * @author Björn Tantau <bjoern@bjoern-tantau.de>
  *
- * @property \Dryspell\Tests\Traits\AnnotationPropertiesTestClass $baz Baz property.
+ * @property AnnotationPropertiesTestClass $baz Baz property.
  * @property string $bar Bar property, this time as string.
  */
 class AnnotationPropertiesTestClassChild extends AnnotationPropertiesTestClass
