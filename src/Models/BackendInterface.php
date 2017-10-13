@@ -2,8 +2,6 @@
 
 namespace Dryspell\Models;
 
-use Classgen\Stub\ClassStub;
-
 /**
  * Backend for actually saving and retrieving
  * data to/from a file or database.
@@ -14,13 +12,13 @@ interface BackendInterface
 {
 
     /**
-     * Create migration class to get from current state
+     * Create migration lines to get from current state
      * of the databse (or file) to the required state.
      *
      * @param ObjectInterface $object
-     * @return ClassStub
+     * @return array
      */
-    public function createMigration(ObjectInterface $object, ClassStub $class): ClassStub;
+    public function createMigration(ObjectInterface $object): array;
 
     /**
      * Save the data in the given object to a file or database.

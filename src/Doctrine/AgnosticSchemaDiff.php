@@ -32,7 +32,7 @@ class AgnosticSchemaDiff implements GeneratorHelperInterface
         return [
             [
                 'name' => 'schema',
-                'type' => Schema::class,
+                'type' => '\\' . Schema::class,
             ],
         ];
     }
@@ -76,17 +76,22 @@ class AgnosticSchemaDiff implements GeneratorHelperInterface
         }
 
         foreach ($this->diff->newSequences as $sequence) {
-            $commands[] = $this->call('$schema->createSequence', [$sequence->getName(), $sequence->getAllocationSize(), $sequence->getInitialValue()]);
+            $commands[] = $this->call('$schema->createSequence',
+                [$sequence->getName(), $sequence->getAllocationSize(), $sequence->getInitialValue()]);
         }
 
         foreach ($this->diff->changedSequences as $sequence) {
-            $commands[] = $this->call('$sequence = $schema->getSequence', [$sequence->getName()]);
-            $commands[] = $this->call('$sequence->setAllocationSize', [$sequence->getAllocationSize()]);
-            $commands[] = $this->call('$sequence->setInitialValue', [$sequence->getInitialValue()]);
+            $commands[] = $this->call('$sequence = $schema->getSequence',
+                [$sequence->getName()]);
+            $commands[] = $this->call('$sequence->setAllocationSize',
+                [$sequence->getAllocationSize()]);
+            $commands[] = $this->call('$sequence->setInitialValue',
+                [$sequence->getInitialValue()]);
         }
 
         foreach ($this->diff->removedSequences as $sequence) {
-            $commands[] = $this->call('$schema->dropSequence', [$sequence->getName()]);
+            $commands[] = $this->call('$schema->dropSequence',
+                [$sequence->getName()]);
         }
 
         return $commands;
@@ -166,22 +171,26 @@ class AgnosticSchemaDiff implements GeneratorHelperInterface
         foreach ($diff->changedColumns as $column_diff) {
             $commands[] = $this->call('throw new \\' . Exception::class,
                 ['Changing a column may lead to data loss. Check your changes and remove this exception.']);
-            $commands[] = $this->call('$table->changeColumn', [$column_diff->oldColumnName, $column_diff->column->toArray()]);
+            $commands[] = $this->call('$table->changeColumn',
+                [$column_diff->oldColumnName, $column_diff->column->toArray()]);
         }
 
         foreach ($diff->renamedColumns as $old_column_name => $column) {
             $commands[] = $this->call('throw new \\' . Exception::class,
                 ['Renaming a column may lead to data loss. Migrate your data and remove this exception.']);
-            $commands[] = $this->call('$table->changeColumn', [$old_column_name, $column->toArray()]);
+            $commands[] = $this->call('$table->changeColumn',
+                [$old_column_name, $column->toArray()]);
         }
 
         foreach ($diff->addedIndexes as $index) {
-            $commands[] = $this->call('$table->addIndex', [$index->getColumns(), $index->getName(), $index->getFlags(), $index->getOptions()]);
+            $commands[] = $this->call('$table->addIndex',
+                [$index->getColumns(), $index->getName(), $index->getFlags(), $index->getOptions()]);
         }
 
         foreach ($diff->changedIndexes as $index) {
             $commands[] = $this->call('$table->dropIndex', [$index->getName()]);
-            $commands[] = $this->call('$table->addIndex', [$index->getColumns(), $index->getName(), $index->getFlags(), $index->getOptions()]);
+            $commands[] = $this->call('$table->addIndex',
+                [$index->getColumns(), $index->getName(), $index->getFlags(), $index->getOptions()]);
         }
 
         foreach ($diff->removedIndexes as $index) {
@@ -189,20 +198,27 @@ class AgnosticSchemaDiff implements GeneratorHelperInterface
         }
 
         foreach ($diff->renamedIndexes as $old_index_name => $index) {
-            $commands[] = $this->call('$table->renameIndex', [$old_index_name, $index->getName()]);
+            $commands[] = $this->call('$table->renameIndex',
+                [$old_index_name, $index->getName()]);
         }
 
         foreach ($diff->addedForeignKeys as $foreign_key) {
-            $commands[] = $this->call('$table->addForeignKeyConstraint', [$foreign_key->getForeignTableName(), $foreign_key->getLocalColumns(), $foreign_key->getForeignColumns(), $foreign_key->getOptions(), $foreign_key->getName()]);
+            $commands[] = $this->call('$table->addForeignKeyConstraint',
+                [$foreign_key->getForeignTableName(), $foreign_key->getLocalColumns(),
+                $foreign_key->getForeignColumns(), $foreign_key->getOptions(), $foreign_key->getName()]);
         }
 
         foreach ($diff->changedForeignKeys as $foreign_key) {
-            $commands[] = $this->call('$table->removeForeignKey', [$foreign_key->getName()]);
-            $commands[] = $this->call('$table->addForeignKeyConstraint', [$foreign_key->getForeignTableName(), $foreign_key->getLocalColumns(), $foreign_key->getForeignColumns(), $foreign_key->getOptions(), $foreign_key->getName()]);
+            $commands[] = $this->call('$table->removeForeignKey',
+                [$foreign_key->getName()]);
+            $commands[] = $this->call('$table->addForeignKeyConstraint',
+                [$foreign_key->getForeignTableName(), $foreign_key->getLocalColumns(),
+                $foreign_key->getForeignColumns(), $foreign_key->getOptions(), $foreign_key->getName()]);
         }
 
         foreach ($diff->removedForeignKeys as $foreign_key) {
-            $commands[] = $this->call('$table->removeForeignKey', [$foreign_key->getName()]);
+            $commands[] = $this->call('$table->removeForeignKey',
+                [$foreign_key->getName()]);
         }
 
         if (isset($diff->addedIndexes['primary'])) {
@@ -218,7 +234,7 @@ class AgnosticSchemaDiff implements GeneratorHelperInterface
         return [
             [
                 'name' => 'schema',
-                'type' => Schema::class,
+                'type' => '\\' . Schema::class,
             ],
         ];
     }

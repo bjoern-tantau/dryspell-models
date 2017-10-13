@@ -2,7 +2,6 @@
 
 namespace Dryspell\Models\Backends;
 
-use Classgen\Stub\ClassStub;
 use DateTime;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Migrations\AbstractMigration;
@@ -70,10 +69,9 @@ class Doctrine implements BackendInterface
      * of the databse to the required state.
      *
      * @param ObjectInterface $object
-     * @param ClassStub $class
-     * @return ClassStub
+     * @return array
      */
-    public function createMigration(ObjectInterface $object, ClassStub $class): ClassStub
+    public function createMigration(ObjectInterface $object): array
     {
         $schema_manager = $this->conn->getSchemaManager();
         $from_schema = $schema_manager->createSchema();
@@ -81,21 +79,18 @@ class Doctrine implements BackendInterface
         $diff = $this->getDiff($from_schema, $to_schema);
 
         $a_diff = new AgnosticSchemaDiff($diff);
-        $class->extendsFrom('\\' . AbstractMigration::class);
-        $up = $class->addMethod('up');
-        foreach ($a_diff->getUpParameters() as $param) {
-            $up->addParameter($param['name'], $param['type'] ?? null);
-        }
-        foreach ($a_diff->getUpCommands() as $command) {
-            $up->initialize($command);
-        }
-        $down = $class->addMethod('down');
-        foreach ($a_diff->getDownParameters() as $param) {
-            $down->addParameter($param['name'], $param['type'] ?? null);
-        }
-        foreach ($a_diff->getDownCommands() as $command) {
-            $down->initialize($command);
-        }
+
+        $class = [
+            'extends' => '\\' . AbstractMigration::class,
+            'up'      => [
+                'parameters' => $a_diff->getUpParameters(),
+                'lines'      => $a_diff->getUpCommands(),
+            ],
+            'down'    => [
+                'parameters' => $a_diff->getDownParameters(),
+                'lines'      => $a_diff->getDownCommands(),
+            ],
+        ];
         return $class;
     }
 

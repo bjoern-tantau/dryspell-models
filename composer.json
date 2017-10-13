@@ -18,7 +18,6 @@
     },
     "require": {
         "php": ">=7.1",
-        "offworks/classgen": "^1.0",
         "illuminate/support": "^v5.4.9-stable",
         "phpdocumentor/reflection-docblock": "^4",
         "doctrine/dbal": "^v2.5.12-stable",

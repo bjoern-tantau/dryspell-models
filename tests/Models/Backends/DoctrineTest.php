@@ -2,15 +2,16 @@
 
 namespace Dryspell\Tests\Models\Backends;
 
-use Classgen\Stub\ClassStub;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Driver;
-use Doctrine\DBAL\DriverManager;
 use Doctrine\DBAL\Types\Type;
-use PHPunit\Framework\TestCase;
-use RtLopez\Decimal;
 use Dryspell\Models\Backends\Doctrine;
+use Dryspell\Models\Backends\Exception;
 use Dryspell\Models\Object;
+use Generator;
+use PDO;
+use PHPunit\Framework\TestCase;
+use function snake_case;
 
 /**
  * Tests for doctrine based backend model
@@ -50,30 +51,45 @@ class DoctrineTest extends TestCase
             ->method('getSchemaManager')
             ->will($this->returnValue($schema_manager));
         $backend = new Doctrine($conn);
-        $class = new ClassStub('Version1');
-        $actual = $backend->createMigration($object, $class);
-        $this->assertEquals($class, $actual);
+        $actual = $backend->createMigration($object);
 
-        $actual = $class->getMethod('up')->getCodeStub()->toLines();
         $expected = [
-            '$table = $schema->createTable(\'' . snake_case(get_class($object)) . '\');',
-            '',
-            '$table->addColumn(\'id\', \'integer\', unserialize(\'' . addcslashes(serialize([
-                'name'             => 'id',
-                'type'             => Type::getType(Type::INTEGER),
-                'default'          => null,
-                'notnull'          => true,
-                'length'           => null,
-                'precision'        => 10,
-                'scale'            => 0,
-                'fixed'            => false,
-                'unsigned'         => true,
-                'autoincrement'    => true,
-                'columnDefinition' => null,
-                'comment'          => null,
-                ]), "\'\\") . '\'));',
-            '',
-            '$table->setPrimaryKey(unserialize(\'' . serialize(['id']) . '\'));',
+            'extends' => '\\Doctrine\\DBAL\\Migrations\\AbstractMigration',
+            'up'      => [
+                'parameters' => [
+                    [
+                        'name' => 'schema',
+                        'type' => '\Doctrine\DBAL\Schema\Schema',
+                    ],
+                ],
+                'lines'      => [
+                    '$table = $schema->createTable(\'' . snake_case(get_class($object)) . '\');',
+                    '$table->addColumn(\'id\', \'integer\', unserialize(\'' . addcslashes(serialize([
+                        'name'             => 'id',
+                        'type'             => Type::getType(Type::INTEGER),
+                        'default'          => null,
+                        'notnull'          => true,
+                        'length'           => null,
+                        'precision'        => 10,
+                        'scale'            => 0,
+                        'fixed'            => false,
+                        'unsigned'         => true,
+                        'autoincrement'    => true,
+                        'columnDefinition' => null,
+                        'comment'          => null,
+                        ]), "\'\\") . '\'));',
+                    '$table->setPrimaryKey(unserialize(\'' . serialize(['id']) . '\'));',
+                ],
+            ],
+            'down'    => [
+                'parameters' => [
+                    [
+                        'name' => 'schema',
+                        'type' => '\Doctrine\DBAL\Schema\Schema',
+                    ],
+                ],
+                'lines'      => [],
+            ],
         ];
         $this->assertEquals($expected, $actual);
     }
@@ -113,28 +129,44 @@ class DoctrineTest extends TestCase
             ->method('getSchemaManager')
             ->will($this->returnValue($schema_manager));
         $backend = new Doctrine($conn);
-        $class = new ClassStub('Version1');
-        $actual = $backend->createMigration($object, $class);
-        $this->assertEquals($class, $actual);
 
-        $actual = $class->getMethod('up')->getCodeStub()->toLines();
+        $actual = $backend->createMigration($object);
         $expected = [
-            '$table = $schema->getTable(\'' . snake_case(get_class($object)) . '\');',
-            '',
-            '$table->addColumn(\'foo\', \'string\', unserialize(\'' . addcslashes(serialize([
-                'name'             => 'foo',
-                'type'             => Type::getType(Type::STRING),
-                'default'          => null,
-                'notnull'          => true,
-                'length'           => null,
-                'precision'        => 10,
-                'scale'            => 0,
-                'fixed'            => false,
-                'unsigned'         => false,
-                'autoincrement'    => false,
-                'columnDefinition' => null,
-                'comment'          => null,
-                ]), "\'\\") . '\'));',
+            'extends' => '\\Doctrine\\DBAL\\Migrations\\AbstractMigration',
+            'up'      => [
+                'parameters' => [
+                    [
+                        'name' => 'schema',
+                        'type' => '\Doctrine\DBAL\Schema\Schema',
+                    ],
+                ],
+                'lines'      => [
+                    '$table = $schema->getTable(\'' . snake_case(get_class($object)) . '\');',
+                    '$table->addColumn(\'foo\', \'string\', unserialize(\'' . addcslashes(serialize([
+                        'name'             => 'foo',
+                        'type'             => Type::getType(Type::STRING),
+                        'default'          => null,
+                        'notnull'          => true,
+                        'length'           => null,
+                        'precision'        => 10,
+                        'scale'            => 0,
+                        'fixed'            => false,
+                        'unsigned'         => false,
+                        'autoincrement'    => false,
+                        'columnDefinition' => null,
+                        'comment'          => null,
+                        ]), "\'\\") . '\'));',
+                ],
+            ],
+            'down'    => [
+                'parameters' => [
+                    [
+                        'name' => 'schema',
+                        'type' => '\Doctrine\DBAL\Schema\Schema',
+                    ],
+                ],
+                'lines'      => [],
+            ],
         ];
         $this->assertEquals($expected, $actual);
     }
@@ -258,7 +290,7 @@ class DoctrineTest extends TestCase
      * Is an exception thrown when trying to update a deleted object?
      *
      * @test
-     * @expectedException \Dryspell\Models\Backends\Exception
+     * @expectedException Exception
      * @expectedExceptionCode 1
      */
     public function testSaveSeeminglyExisting()
@@ -356,7 +388,7 @@ class DoctrineTest extends TestCase
         $stmt = $this->createMock(Driver\PDOStatement::class);
         $stmt->expects($this->once())
             ->method('fetch')
-            ->with(\PDO::FETCH_ASSOC)
+            ->with(PDO::FETCH_ASSOC)
             ->willReturn(['id' => 1, 'foo' => 'bar']);
 
         $query_builder = $this->createMock(\Doctrine\DBAL\Query\QueryBuilder::class);
@@ -390,7 +422,7 @@ class DoctrineTest extends TestCase
         $term = 1;
         $actual = $backend->find($object, $term);
         /* @var $actual \Geanerator */
-        $this->assertInstanceOf(\Generator::class, $actual);
+        $this->assertInstanceOf(Generator::class, $actual);
         $actual = $actual->current();
         $this->assertInstanceOf(Object::class, $actual);
         $this->assertEquals(1, $actual->id);

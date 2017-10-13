@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "50f3d885f88a6df4d9703fe0fe88d599",
-    "content-hash": "cb047212ccdd8d3bcbc3af50af78ae2b",
+    "hash": "7868ba335f2bdc182b2074243a861727",
+    "content-hash": "704d1d18182abb7b499f298265f752b6",
     "packages": [
         {
             "name": "doctrine/annotations",
@@ -828,46 +828,6 @@
                 "service proxies"
             ],
             "time": "2017-05-04 11:12:50"
-        },
-        {
-            "name": "offworks/classgen",
-            "version": "v1.0.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/offworks/classgen.git",
-                "reference": "fa841bae8eeaf79c5f43d7c48a28be2d93a905e0"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/offworks/classgen/zipball/fa841bae8eeaf79c5f43d7c48a28be2d93a905e0",
-                "reference": "fa841bae8eeaf79c5f43d7c48a28be2d93a905e0",
-                "shasum": ""
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "Classgen\\": "src"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Ahmad Rahimie Ahmad Zailani",
-                    "email": "newrehmi@gmail.com",
-                    "role": "lead"
-                }
-            ],
-            "description": "A simple, dynamic and programmatically fluent PHP class generator.",
-            "keywords": [
-                "class",
-                "php",
-                "php class generator",
-                "stub"
-            ],
-            "time": "2016-11-12 04:44:49"
         },
         {
             "name": "phpdocumentor/reflection-common",
