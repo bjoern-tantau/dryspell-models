@@ -394,6 +394,7 @@ class DoctrineTest extends TestCase
         $query_builder = $this->createMock(\Doctrine\DBAL\Query\QueryBuilder::class);
         $query_builder->expects($this->once())
             ->method('select')
+            ->with('*')
             ->will($this->returnSelf());
         $query_builder->expects($this->once())
             ->method('from')

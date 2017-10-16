@@ -185,7 +185,7 @@ class Doctrine implements BackendInterface
     public function find(ObjectInterface $object, $term): iterable
     {
         $query = $this->conn->createQueryBuilder();
-        $query->select()
+        $query->select('*')
             ->from($this->getTableName($object));
         if (!is_array($term)) {
             $term = [$object->getIdProperty() => $term];
