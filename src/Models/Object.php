@@ -21,9 +21,24 @@ abstract class Object implements ObjectInterface
     /** @var BackendInterface Data-Managing Backend. */
     private $backend;
 
+    /**
+     * Currently selected key in the iteration
+     *
+     * @var integer
+     */
+    private $current = 0;
+
+    /**
+     * Keys to iterate over
+     * 
+     * @var array
+     */
+    private $keys = [];
+
     public function __construct(BackendInterface $backend)
     {
         $this->backend = $backend;
+        $this->keys = array_keys($this->getProperties());
     }
 
     /**
@@ -54,13 +69,10 @@ abstract class Object implements ObjectInterface
      * Array searches for the given property key with the given value.
      * @return Object[]
      */
-    public function find($term): \Iterator
+    public function find($term): iterable
     {
-        $data = $this->backend->find($this, $term);
-        foreach ($data as $values) {
-            $obj = new static($this->backend);
-            $obj->setValues($values);
-            yield $obj;
+        foreach ($this->backend->find($this, $term) as $object) {
+            yield $object;
         }
     }
 
@@ -105,5 +117,61 @@ abstract class Object implements ObjectInterface
             $this->$key = $value;
         }
         return $this;
+    }
+
+    /**
+     * (PHP 5 >= 5.0.0, PHP 7)<br/>
+     * Return the current element
+     * @link http://php.net/manual/en/iterator.current.php
+     * @return mixed Can return any type.
+     */
+    public function current()
+    {
+        return $this->{$this->keys[$this->current]};
+    }
+
+    /**
+     * (PHP 5 >= 5.0.0, PHP 7)<br/>
+     * Return the key of the current element
+     * @link http://php.net/manual/en/iterator.key.php
+     * @return scalar scalar on success, or <b>NULL</b> on failure.
+     */
+    public function key()
+    {
+        return $this->keys[$this->current];
+    }
+
+    /**
+     * (PHP 5 >= 5.0.0, PHP 7)<br/>
+     * Move forward to next element
+     * @link http://php.net/manual/en/iterator.next.php
+     * @return void Any returned value is ignored.
+     */
+    public function next(): void
+    {
+        $this->current++;
+    }
+
+    /**
+     * (PHP 5 >= 5.0.0, PHP 7)<br/>
+     * Rewind the Iterator to the first element
+     * @link http://php.net/manual/en/iterator.rewind.php
+     * @return void Any returned value is ignored.
+     */
+    public function rewind(): void
+    {
+        $this->current = 0;
+    }
+
+    /**
+     * (PHP 5 >= 5.0.0, PHP 7)<br/>
+     * Checks if current position is valid
+     * @link http://php.net/manual/en/iterator.valid.php
+     * @return boolean The return value will be casted to boolean and then evaluated.
+     * Returns <b>TRUE</b> on success or <b>FALSE</b> on failure.
+     */
+    public function valid(): bool
+    {
+        return isset($this->keys[$this->current]);
     }
 }

@@ -175,7 +175,7 @@ class Doctrine implements BackendInterface
     }
 
     /**
-     * Search data for the given object. Returns arrays.
+     * Search data for the given object. Returns objects.
      *
      * @param ObjectInterface $object
      * @param int|string|array $term Integer or string searches for the objects id.
@@ -197,7 +197,9 @@ class Doctrine implements BackendInterface
         $stmt = $query->execute();
         while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
             $new_object = clone $object;
-            $new_object->setValues($row);
+            foreach ($row as $key => $value) {
+                $this->setProperty($new_object, $key, $value);
+            }
             yield $new_object;
         }
     }
@@ -226,9 +228,14 @@ class Doctrine implements BackendInterface
                 throw new Exception('Object with id ' . $id . ' does not exist anymore.',
                 Exception::NOT_EXISTS);
             }
-            $conn->insert($table, $object->getValues());
+
+            $conn->insert($table,
+                array_filter($object->getValues(),
+                    function($value) {
+                    return !is_null($value);
+                }));
             $id = $conn->lastInsertId();
-            $object->{$object->getIdProperty()} = $id;
+            $this->setProperty($object, $object->getIdProperty(), $id);
         });
 
         return $this;
@@ -310,5 +317,36 @@ class Doctrine implements BackendInterface
             }
         }
         return $out;
+    }
+
+    private function setProperty(\Dryspell\Models\Object $object, string $property, $value)
+    {
+        $options = $object->getProperties()[$property];
+        switch($options['type']) {
+            case 'bool':
+            case 'boolean':
+                $value = boolval($value);
+                break;
+            case 'int':
+            case 'integer':
+                $value = intval($value);
+                break;
+            case 'float':
+                $value = floatval($value);
+                break;
+            case 'string':
+                // Usually already a string
+                break;
+            case 'array':
+                if (is_string($value)) {
+                    $value = unserialize($value);
+                }
+                break;
+            default:
+                $value = new $options['type']($value);
+                break;
+        }
+        $object->$property = $value;
+        return $this;
     }
 }

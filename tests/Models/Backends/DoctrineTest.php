@@ -205,8 +205,7 @@ class DoctrineTest extends TestCase
 
         $conn->expects($this->once())
             ->method('insert')
-            ->with(snake_case(get_class($object)),
-                ['foo' => 'bar', 'id' => null]);
+            ->with(snake_case(get_class($object)), ['foo' => 'bar']);
         $conn->expects($this->once())
             ->method('lastInsertId')
             ->will($this->returnValue(1));

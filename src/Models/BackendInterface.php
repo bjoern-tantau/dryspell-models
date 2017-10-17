@@ -29,7 +29,7 @@ interface BackendInterface
     public function save(ObjectInterface $object): self;
 
     /**
-     * Search data for the given object. Returns arrays.
+     * Search data for the given object. Returns objects.
      *
      * @param ObjectInterface $object
      * @param int|string|array $term Integer or string searches for the objects id.

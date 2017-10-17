@@ -135,25 +135,28 @@ class ObjectTest extends TestCase
         $backend = $this->getMockBuilder(\Dryspell\Models\BackendInterface::class)->getMock();
         $object = $this->getMockForAbstractClass(\Dryspell\Models\Object::class,
             [$backend]);
+        $obj2 = clone $object;
+        $obj3 = clone $object;
+        $obj4 = clone $object;
         $backend->expects($this->once())
             ->method('find')
             ->with($object, ['id' => ['>' => 1]])
             ->will($this->returnValue([
-                    [
+                    $obj2->setValues([
                         'id'         => 2,
                         'created_at' => new \DateTime('2000-01-01'),
                         'updated_at' => new \DateTime('2000-01-01'),
-                    ],
-                    [
+                    ]),
+                    $obj3->setValues([
                         'id'         => 3,
                         'created_at' => new \DateTime('2000-01-01'),
                         'updated_at' => new \DateTime('2000-01-01'),
-                    ],
-                    [
+                    ]),
+                    $obj4->setValues([
                         'id'         => 4,
                         'created_at' => new \DateTime('2000-01-01'),
                         'updated_at' => new \DateTime('2000-01-01'),
-                    ],
+                    ]),
         ]));
         $actual = $object->find(['id' => ['>' => 1]]);
         $this->assertInstanceOf(\Generator::class, $actual);

@@ -2,13 +2,15 @@
 
 namespace Dryspell\Models;
 
+use Iterator;
+
 /**
  * Generic Interface for objects
  * that can be saved in a database or file.
  *
  * @author Björn Tantau <bjoern@bjoern-tantau.de>
  */
-interface ObjectInterface
+interface ObjectInterface extends Iterator
 {
 
     /**
@@ -55,7 +57,7 @@ interface ObjectInterface
      * Array searches for the given property key with the given value.
      * @return ObjectInterface[]
      */
-    public function find($term): \Iterator;
+    public function find($term): iterable;
 
     /**
      * Find one instance of the object with the given criteria.
