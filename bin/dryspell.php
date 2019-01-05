@@ -15,7 +15,7 @@ use Symfony\Component\Console\Helper\HelperSet;
 require_once __DIR__ . '/../vendor/autoload.php';
 
 $options   = getopt('b:', ['bootstrap:']);
-$bootstrap = $options['bootstrap'] ?? $options['b'] ?? __DIR__ . '/../src/bootstrap.php';
+$bootstrap = $options['bootstrap'] ?? $options['b'] ?? 'src/bootstrap.php';
 $container = include $bootstrap;
 
 if (!($container instanceof ContainerInterface)) {
