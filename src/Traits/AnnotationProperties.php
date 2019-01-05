@@ -22,6 +22,7 @@ trait AnnotationProperties
         'length'          => true,
         'on_update'       => true,
         'required'        => true,
+        'nullable'        => true,
         'signed'          => true,
         'unsigned'        => true,
     ];
@@ -91,7 +92,7 @@ trait AnnotationProperties
 
     /**
      * Extracts options beginning with @ from the given string
-     * 
+     *
      * @param string $desc
      * @return array
      */
@@ -119,6 +120,7 @@ trait AnnotationProperties
                         case 'id':
                         case 'required':
                         case 'unsigned':
+                        case 'nullable':
                             $value = true;
                             if (strtolower($value) == 'false') {
                                 $value = false;

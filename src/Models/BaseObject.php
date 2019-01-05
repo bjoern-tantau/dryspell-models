@@ -11,7 +11,7 @@ namespace Dryspell\Models;
  * @property \DateTime $created_at Time and date of creation. @default(now)
  * @property \DateTime $updated_at Time and date of last update. @default(now), @OnUpdate(now)
  */
-abstract class Object implements ObjectInterface
+abstract class BaseObject implements ObjectInterface
 {
 
     use \Dryspell\Traits\AnnotationProperties;
@@ -30,7 +30,7 @@ abstract class Object implements ObjectInterface
 
     /**
      * Keys to iterate over
-     * 
+     *
      * @var array
      */
     private $keys = [];
@@ -54,7 +54,7 @@ abstract class Object implements ObjectInterface
     /**
      * Save data via the backend.
      *
-     * @return Object
+     * @return BaseObject
      */
     public function save(): ObjectInterface
     {
@@ -67,7 +67,7 @@ abstract class Object implements ObjectInterface
      *
      * @param int|string|array $term Integer or string searches for the objects id.
      * Array searches for the given property key with the given value.
-     * @return Object[]
+     * @return BaseObject[]
      */
     public function find($term): iterable
     {
@@ -81,7 +81,7 @@ abstract class Object implements ObjectInterface
      *
      * @param int|string $id Id of the desired object.
      * Array searches for the given property key with the given value.
-     * @return Object
+     * @return BaseObject
      */
     public function load($id): ObjectInterface
     {
@@ -109,7 +109,7 @@ abstract class Object implements ObjectInterface
      * Mass-assign values to properties.
      *
      * @param array $values Associative array of properties and their values.
-     * @return Object
+     * @return BaseObject
      */
     public function setValues(array $values): ObjectInterface
     {

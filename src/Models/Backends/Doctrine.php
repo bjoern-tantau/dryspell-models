@@ -1,20 +1,12 @@
 <?php
-
 namespace Dryspell\Models\Backends;
 
-use DateTime;
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Migrations\AbstractMigration;
-use Doctrine\DBAL\Schema\Comparator;
-use Doctrine\DBAL\Schema\Schema;
-use Doctrine\DBAL\Schema\SchemaDiff;
-use Dryspell\Doctrine\AgnosticSchemaDiff;
-use Dryspell\InvalidTypeException;
 use Dryspell\Models\BackendInterface;
+use Dryspell\Models\BaseObject;
 use Dryspell\Models\ObjectInterface;
 use PDO;
 use ReflectionClass;
-use RtLopez\Decimal;
 use function snake_case;
 
 /**
@@ -24,154 +16,20 @@ use function snake_case;
  */
 class Doctrine implements BackendInterface
 {
+
     /**
      * @var Connection
      */
     private $conn;
-    private $type_map = [
-        DateTime::class        => 'datetimetz',
-        ObjectInterface::class => 'integer',
-        Decimal::class         => 'decimal',
-    ];
-    private $allowed_options = [
-        'boolean'    => [
-            'default' => true,
-        ],
-        'integer'    => [
-            'generated_value' => 'autoincrement',
-            'unsigned'        => true,
-            'default'         => true,
-        ],
-        'float'      => [
-            'default' => true,
-        ],
-        'string'     => [
-            'length'  => true,
-            'default' => true,
-        ],
-        'datetimetz' => [
-            'default' => true,
-        ],
-    ];
 
     /**
      * Initialise Backend
-     * 
+     *
      * @param Connection $conn
      */
     public function __construct(Connection $conn)
     {
         $this->conn = $conn;
-    }
-
-    /**
-     * Create migration class to get from current state
-     * of the databse to the required state.
-     *
-     * @param ObjectInterface $object
-     * @return array
-     */
-    public function createMigration(ObjectInterface $object): array
-    {
-        $schema_manager = $this->conn->getSchemaManager();
-        $from_schema = $schema_manager->createSchema();
-        $to_schema = $this->getToSchema($from_schema, $object);
-        $diff = $this->getDiff($from_schema, $to_schema);
-
-        $a_diff = new AgnosticSchemaDiff($diff);
-
-        $class = [
-            'extends' => '\\' . AbstractMigration::class,
-            'up'      => [
-                'parameters' => $a_diff->getUpParameters(),
-                'lines'      => $a_diff->getUpCommands(),
-            ],
-            'down'    => [
-                'parameters' => $a_diff->getDownParameters(),
-                'lines'      => $a_diff->getDownCommands(),
-            ],
-        ];
-        return $class;
-    }
-
-    /**
-     * Generate a new schema to compare against
-     * 
-     * @param Schema $from_schema
-     * @param ObjectInterface $object
-     * @return Schema
-     */
-    private function getToSchema(Schema $from_schema, ObjectInterface $object): Schema
-    {
-        $to_schema = clone $from_schema;
-        $table_name = $this->getTableName($object);
-        if ($to_schema->hasTable($table_name)) {
-            $to_schema->dropTable($table_name);
-        }
-        $table = $to_schema->createTable($table_name);
-        $primary_keys = [];
-        foreach ($object->getProperties() as $property => $options) {
-            $column_name = $this->getColumnName($property, $options);
-            $type = $this->getType($options);
-            $column_options = $this->getOptions($options);
-            $table->addColumn($column_name, $type, $column_options);
-
-            if (!empty($options['id'])) {
-                $primary_keys[] = $column_name;
-            }
-
-            if (is_subclass_of($options['type'], ObjectInterface::class) || is_a($options['type'],
-                    ObjectInterface::class, true)) {
-                $table->addIndex([$column_name]);
-                $foreign_table = $this->getTableName($options['type']);
-                $foreign_key = call_user_func($options['type'] . '::getIdProperty');
-                $on_update = 'CASCADE';
-                $on_delete = 'CASCADE';
-                $table->addForeignKeyConstraint($foreign_table, [$column_name],
-                    [$foreign_key],
-                    ['onUpdate' => $on_update, 'onDelete' => $on_delete]);
-            }
-        }
-        if (!empty($primary_keys)) {
-            $table->setPrimaryKey($primary_keys);
-        }
-        return $to_schema;
-    }
-
-    /**
-     * Get a diff between two schemas
-     *
-     * @param Schema $from_schema
-     * @param Schema $to_schema
-     * @return SchemaDiff
-     */
-    private function getDiff(Schema $from_schema, Schema $to_schema): SchemaDiff
-    {
-        return Comparator::compareSchemas($from_schema, $to_schema);
-    }
-
-    /**
-     * Get commands to migrate diff up
-     * 
-     * @param SchemaDiff $diff
-     * @return array
-     */
-    private function getUpCommands(SchemaDiff $diff): array
-    {
-        $a_diff = new AgnosticSchemaDiff($diff);
-        return $a_diff->getUpCommands();
-    }
-
-    /**
-     * Get commands to migrate diff down
-     * 
-     * @param SchemaDiff $diff
-     * @return array
-     */
-    private function getDownCommands(SchemaDiff $diff): array
-    {
-        $a_diff = new AgnosticSchemaDiff($diff);
-        return $a_diff->getDownCommands();
     }
 
     /**
@@ -195,7 +53,7 @@ class Doctrine implements BackendInterface
         }
         $query->setParameters(array_values($term));
         $stmt = $query->execute();
-        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+        while ($row  = $stmt->fetch(PDO::FETCH_ASSOC)) {
             $new_object = clone $object;
             foreach ($row as $key => $value) {
                 $this->setProperty($new_object, $key, $value);
@@ -226,7 +84,7 @@ class Doctrine implements BackendInterface
                     return;
                 }
                 throw new Exception('Object with id ' . $id . ' does not exist anymore.',
-                Exception::NOT_EXISTS);
+                    Exception::NOT_EXISTS);
             }
 
             $conn->insert($table,
@@ -247,82 +105,10 @@ class Doctrine implements BackendInterface
         return snake_case($reflect->getShortName());
     }
 
-    private function getColumnName(string $property, array $options)
-    {
-        if (is_subclass_of($options['type'], ObjectInterface::class)) {
-            $property .= '_id';
-        }
-        return $property;
-    }
-
-    private function getType(array $options)
-    {
-        switch ($options['type']) {
-            case 'bool':
-            case 'boolean':
-                $type = 'boolean';
-                break;
-            case 'int':
-            case 'integer':
-                $type = 'integer';
-                break;
-            case 'float':
-                $type = 'float';
-                break;
-            case 'string':
-                $type = 'string';
-                break;
-            case 'array':
-                $type = 'array';
-                break;
-            default:
-                foreach ($this->type_map as $class => $alias) {
-                    if (is_subclass_of($options['type'], $class) || is_a($options['type'],
-                            $class, true)) {
-                        $type = $alias;
-                        break;
-                    }
-                }
-                break;
-        }
-        if (!isset($type)) {
-            throw new InvalidTypeException('Unknown type: ' . $options['type']);
-        }
-        return $type;
-    }
-
-    private function getOptions(array $options)
-    {
-        $out = [];
-        $type = $this->getType($options);
-        foreach ($options as $option => $value) {
-            if (isset($this->allowed_options[$type][$option])) {
-                if (is_string($this->allowed_options[$type][$option])) {
-                    $option = $this->allowed_options[$type][$option];
-                }
-                $out[$option] = $value;
-            }
-        }
-        if (is_subclass_of($options['type'], ObjectInterface::class) || is_a($options['type'],
-                ObjectInterface::class, true)) {
-            $out['unsigned'] = true;
-        }
-        if (is_subclass_of($options['type'], DateTime::class) || is_a($options['type'],
-                DateTime::class, true)) {
-            if (isset($options['default']) && $options['default'] == 'now') {
-                $out['default'] = 0;
-            }
-            if (isset($options['on_update']) && $options['on_update'] == 'now') {
-                $out['version'] = true;
-            }
-        }
-        return $out;
-    }
-
-    private function setProperty(\Dryspell\Models\Object $object, string $property, $value)
+    private function setProperty(BaseObject $object, string $property, $value)
     {
         $options = $object->getProperties()[$property];
-        switch($options['type']) {
+        switch ($options['type']) {
             case 'bool':
             case 'boolean':
                 $value = boolval($value);

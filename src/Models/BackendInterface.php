@@ -1,5 +1,4 @@
 <?php
-
 namespace Dryspell\Models;
 
 /**
@@ -10,15 +9,6 @@ namespace Dryspell\Models;
  */
 interface BackendInterface
 {
-
-    /**
-     * Create migration lines to get from current state
-     * of the databse (or file) to the required state.
-     *
-     * @param ObjectInterface $object
-     * @return array
-     */
-    public function createMigration(ObjectInterface $object): array;
 
     /**
      * Save the data in the given object to a file or database.
