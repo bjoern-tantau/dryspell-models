@@ -252,7 +252,7 @@ class DoctrineTest extends TestCase
             ->will($this->returnSelf());
         $query_builder->expects($this->once())
             ->method('andWhere')
-            ->with('`id` = ?')
+            ->with('`id` LIKE ?')
             ->will($this->returnSelf());
         $query_builder->expects($this->once())
             ->method('setParameters')

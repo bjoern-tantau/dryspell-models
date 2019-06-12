@@ -49,7 +49,7 @@ class Doctrine implements BackendInterface
             $term = [$object->getIdProperty() => $term];
         }
         foreach ($term as $column => $value) {
-            $query->andWhere($this->conn->quoteIdentifier($column) . ' = ?');
+            $query->andWhere($this->conn->quoteIdentifier($column) . ' LIKE ?');
         }
         $query->setParameters(array_values($term));
         $stmt = $query->execute();
