@@ -113,13 +113,23 @@ abstract class BaseObject implements ObjectInterface, JsonSerializable
      * Mass-assign values to properties.
      *
      * @param array $values Associative array of properties and their values.
+     * @param bool $weaklyTyped Perform type conversion while setting.
      * @return BaseObject
      */
-    public function setValues(array $values): ObjectInterface
+    public function setValues(array $values, bool $weaklyTyped = false): ObjectInterface
     {
         foreach ($values as $key => $value) {
+            if ($weaklyTyped) {
+                $value = $this->convertValueForProperty($key, $value);
+            }
             $this->$key = $value;
         }
+        return $this;
+    }
+
+    public function setWeaklyTyped(string $name, $value): \Dryspell\Models\ObjectInterface
+    {
+        $this->$name = $this->convertValueForProperty($name, $value);
         return $this;
     }
 
@@ -189,5 +199,62 @@ abstract class BaseObject implements ObjectInterface, JsonSerializable
     public function jsonSerialize()
     {
         return $this->getValues();
+    }
+
+    /**
+     * Converts the given value for the named property to the appropriate type.
+     *
+     * @param string $name
+     * @param mixed $value
+     * @return mixed
+     * @throws InvalidTypeException
+     */
+    private function convertValueForProperty(string $name, $value)
+    {
+        $options = $this->getProperties()[$name];
+        switch ($options['type']) {
+            case 'bool':
+            case 'boolean':
+                $value = boolval($value);
+                break;
+            case 'int':
+            case 'integer':
+                $value = intval($value);
+                break;
+            case 'float':
+                $value = floatval($value);
+                break;
+            case 'string':
+                $value = strval($value);
+                break;
+            case 'array':
+                if (is_string($value)) {
+                    $value = unserialize($value);
+                }
+                break;
+            case '\\' . \DateTime::class:
+                if (is_numeric($value)) {
+                    $date  = new \DateTime();
+                    $date->setTimestamp($value);
+                    $value = $date;
+                } elseif (is_array($value)) {
+                    if (!isset($value['date'])) {
+                        throw new InvalidTypeException("Can't convert array to DateTime.");
+                    }
+                    $date = new \DateTime($value['date']);
+                    if (isset($value['timezone'])) {
+                        $timezone = new \DateTimeZone($value['timezone']);
+                        $date->setTimezone($timezone);
+                    }
+                    $value = $date;
+                } else {
+                    $value = new \DateTime($value);
+                }
+                break;
+            default:
+                $value = new $options['type']($value);
+                break;
+        }
+        return $value;
     }
 }

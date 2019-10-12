@@ -223,8 +223,41 @@ class ObjectTest extends TestCase
             [$backend]);
         $object->setValues($values);
 
-        $actual = json_encode($object);
+        $actual   = json_encode($object);
         $expected = json_encode($values);
+        $this->assertEquals($expected, $actual);
+    }
+
+    /**
+     * Can values be set weakly typed instead of strongly typed?
+     *
+     * @test
+     */
+    public function testSetWeaklyTyped()
+    {
+        $backend = $this->getMockBuilder(\Dryspell\Models\BackendInterface::class)->getMock();
+        /** @var \Dryspell\Models\BaseObject $object */
+        $object  = $this->getMockForAbstractClass(\Dryspell\Models\BaseObject::class,
+            [$backend]);
+
+        $object->setWeaklyTyped('created_at', '2000-01-01');
+        $actual   = $object->created_at;
+        $expected = new \DateTime('2000-01-01');
+
+        $this->assertEquals($expected, $actual);
+
+        $object = $this->getMockForAbstractClass(\Dryspell\Models\BaseObject::class,
+            [$backend]);
+
+        $object->setWeaklyTyped('created_at', [
+            'date'     => '2000-01-01',
+            'timezone' => 'Europe/Berlin',
+        ]);
+        $actual   = $object->created_at;
+        $expected = new \DateTime('2000-01-01');
+        $timezone = new \DateTimeZone('Europe/Berlin');
+        $expected->setTimezone($timezone);
+
         $this->assertEquals($expected, $actual);
     }
 }

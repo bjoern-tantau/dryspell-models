@@ -39,9 +39,19 @@ interface ObjectInterface extends Iterator
      * Mass-assign values to properties.
      *
      * @param array $values Associative array of properties and their values.
+     * @param bool $weaklyTyped Perform type conversion while setting.
      * @return ObjectInterface
      */
-    public function setValues(array $values): self;
+    public function setValues(array $values, bool $weaklyTyped = false): self;
+
+    /**
+     * Set a value while converting it to the required type.
+     *
+     * @param string $name
+     * @param mixed $value
+     * @return ObjectInterface
+     */
+    public function setWeaklyTyped(string $name, $value): self;
 
     /**
      * Save data via the backend.
