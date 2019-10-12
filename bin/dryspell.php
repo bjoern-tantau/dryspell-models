@@ -12,14 +12,28 @@ use Psr\Container\ContainerInterface;
 use Symfony\Component\Console\CommandLoader\ContainerCommandLoader;
 use Symfony\Component\Console\Helper\HelperSet;
 
-require_once __DIR__ . '/../vendor/autoload.php';
+$autoloadPaths = [
+    __DIR__ . '/../vendor/autoload.php',
+    __DIR__ . '/../../../autoload.php'
+];
+$autoloaded    = false;
+foreach ($autoloadPaths as $file) {
+    if (file_exists($file)) {
+        $autoloaded = true;
+        require_once $file;
+        break;
+    }
+}
+if (!$autoloaded) {
+    trigger_error("autoload.php not found", E_USER_ERROR);
+}
 
 $options   = getopt('b:', ['bootstrap:']);
 $bootstrap = $options['bootstrap'] ?? $options['b'] ?? 'src/bootstrap.php';
-$container = include $bootstrap;
-
-if (!($container instanceof ContainerInterface)) {
-    var_dump($options);
+if (file_exists($bootstrap)) {
+    $container = include $bootstrap;
+}
+if (!isset($container) || !($container instanceof ContainerInterface)) {
     throw new Exception('No Container found. Add a file returning a ContainerInterface with the --bootstrap option.');
 }
 
