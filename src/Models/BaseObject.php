@@ -69,7 +69,7 @@ abstract class BaseObject implements ObjectInterface
      * Array searches for the given property key with the given value.
      * @return BaseObject[]
      */
-    public function find($term): iterable
+    public function find($term = null): iterable
     {
         foreach ($this->backend->find($this, $term) as $object) {
             yield $object;

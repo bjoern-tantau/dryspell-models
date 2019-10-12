@@ -26,5 +26,5 @@ interface BackendInterface
      * Array searches for the given property key with the given value.
      * @return iterable
      */
-    public function find(ObjectInterface $object, $term): iterable;
+    public function find(ObjectInterface $object, $term = null): iterable;
 }

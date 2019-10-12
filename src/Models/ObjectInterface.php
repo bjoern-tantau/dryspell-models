@@ -57,7 +57,7 @@ interface ObjectInterface extends Iterator
      * Array searches for the given property key with the given value.
      * @return ObjectInterface[]
      */
-    public function find($term): iterable;
+    public function find($term = null): iterable;
 
     /**
      * Find one instance of the object with the given criteria.

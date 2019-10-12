@@ -40,11 +40,14 @@ class Doctrine implements BackendInterface
      * Array searches for the given property key with the given value.
      * @return iterable
      */
-    public function find(ObjectInterface $object, $term): iterable
+    public function find(ObjectInterface $object, $term = null): iterable
     {
         $query = $this->conn->createQueryBuilder();
         $query->select('*')
             ->from($this->getTableName($object));
+        if (is_null($term)) {
+            $term = [];
+        }
         if (!is_array($term)) {
             $term = [$object->getIdProperty() => $term];
         }
