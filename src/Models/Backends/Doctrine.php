@@ -131,7 +131,7 @@ class Doctrine implements BackendInterface
                     $value = unserialize($value);
                 }
                 break;
-            case \DateTime::class:
+            case '\\' . \DateTime::class:
                 if (is_numeric($value)) {
                     $date = new \DateTime();
                     $date->setTimestamp($value);
