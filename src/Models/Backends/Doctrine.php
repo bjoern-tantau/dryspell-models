@@ -1,9 +1,9 @@
 <?php
 namespace Dryspell\Models\Backends;
 
+use DateTime;
 use Doctrine\DBAL\Connection;
 use Dryspell\Models\BackendInterface;
-use Dryspell\Models\BaseObject;
 use Dryspell\Models\ObjectInterface;
 use PDO;
 use ReflectionClass;
@@ -80,7 +80,7 @@ class Doctrine implements BackendInterface
                 $query = $conn->createQueryBuilder();
                 $query->select($object->getIdProperty())
                     ->from($table)
-                    ->where($object->getIdProperty() . ' = :id')
+                    ->where($conn->quoteIdentifier($object->getIdProperty()) . ' = :id')
                     ->setParameter('id', $id);
                 if ($id == $query->execute()->fetchColumn()) {
                     $conn->update($table, $values,
@@ -132,13 +132,13 @@ class Doctrine implements BackendInterface
                     $value = unserialize($value);
                 }
                 break;
-            case '\\' . \DateTime::class:
+            case '\\' . DateTime::class:
                 if (is_numeric($value)) {
-                    $date  = new \DateTime();
+                    $date  = new DateTime();
                     $date->setTimestamp($value);
                     $value = $date;
                 } else {
-                    $value = new \DateTime($value);
+                    $value = new DateTime($value);
                 }
                 break;
             default:
@@ -154,7 +154,7 @@ class Doctrine implements BackendInterface
         if ($value instanceof ObjectInterface) {
             $value = $value->{$value->getIdProperty()};
         }
-        if ($value instanceof \DateTime) {
+        if ($value instanceof DateTime) {
             $value = $value->format("Y-m-d H:i:s");
         }
         if (is_object($value)) {
@@ -164,5 +164,26 @@ class Doctrine implements BackendInterface
             $value = serialize($value);
         }
         return $value;
+    }
+
+    /**
+     * Remove the data associated with the given object.
+     *
+     * @param ObjectInterface $object
+     * @return Doctrine
+     */
+    public function delete(ObjectInterface $object): BackendInterface
+    {
+        $table = $this->getTableName($object);
+        $this->conn->transactional(function(Connection $conn) use ($table, $object) {
+            if ($id = $object->{$object->getIdProperty()}) {
+                $query = $conn->createQueryBuilder();
+                $query->delete($table)
+                    ->where($conn->quoteIdentifier($object->getIdProperty()) . ' = :id')
+                    ->setParameter('id', $id);
+                $query->execute();
+            }
+        });
+        return $this;
     }
 }

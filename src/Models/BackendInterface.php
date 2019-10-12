@@ -19,6 +19,14 @@ interface BackendInterface
     public function save(ObjectInterface $object): self;
 
     /**
+     * Remove the data associated with the given object.
+     * 
+     * @param ObjectInterface $object
+     * @return BackendInterface
+     */
+    public function delete(ObjectInterface $object): self;
+
+    /**
      * Search data for the given object. Returns objects.
      *
      * @param ObjectInterface $object

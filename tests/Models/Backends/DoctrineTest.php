@@ -29,13 +29,13 @@ class DoctrineTest extends TestCase
      */
     public function testSaveNew()
     {
-        $conn        = $this->getMockBuilder(Connection::class)
+        $conn               = $this->getMockBuilder(Connection::class)
             ->disableOriginalConstructor()
             ->setMethods(['createQueryBuilder', 'insert', 'lastInsertId', 'beginTransaction',
                 'commit', 'rollBack'])
             ->getMock();
-        $backend     = new Doctrine($conn);
-        $object      = $this->getMockBuilder(BaseObject::class)
+        $backend            = new Doctrine($conn);
+        $object             = $this->getMockBuilder(BaseObject::class)
             ->disableOriginalConstructor()
             ->setMethods(['getProperties'])
             ->getMock();
@@ -55,7 +55,7 @@ class DoctrineTest extends TestCase
                         'type' => \DateTime::class,
                     ],
         ]));
-        $object->foo = 'bar';
+        $object->foo        = 'bar';
         $object->created_at = new \DateTime('2000-01-01');
 
         $conn->expects($this->once())
@@ -79,7 +79,7 @@ class DoctrineTest extends TestCase
         $conn        = $this->getMockBuilder(Connection::class)
             ->disableOriginalConstructor()
             ->setMethods(['createQueryBuilder', 'update', 'lastInsertId', 'beginTransaction',
-                'commit', 'rollBack'])
+                'commit', 'rollBack', 'quoteIdentifier'])
             ->getMock();
         $backend     = new Doctrine($conn);
         $object      = $this->getMockBuilder(BaseObject::class)
@@ -118,7 +118,7 @@ class DoctrineTest extends TestCase
             ->will($this->returnSelf());
         $query_builder->expects($this->once())
             ->method('where')
-            ->with('id = :id')
+            ->with('`id` = :id')
             ->will($this->returnSelf());
         $query_builder->expects($this->once())
             ->method('setParameter')
@@ -131,6 +131,10 @@ class DoctrineTest extends TestCase
         $conn->expects($this->once())
             ->method('createQueryBuilder')
             ->will($this->returnValue($query_builder));
+        $conn->expects($this->once())
+            ->method('quoteIdentifier')
+            ->with('id')
+            ->will($this->returnValue('`id`'));
         $conn->expects($this->once())
             ->method('update')
             ->with(snake_case(get_class($object)), ['foo' => 'bar', 'id' => 1],
@@ -152,7 +156,7 @@ class DoctrineTest extends TestCase
         $conn        = $this->getMockBuilder(Connection::class)
             ->disableOriginalConstructor()
             ->setMethods(['createQueryBuilder', 'insert', 'lastInsertId', 'beginTransaction',
-                'commit', 'rollBack'])
+                'commit', 'rollBack', 'quoteIdentifier'])
             ->getMock();
         $backend     = new Doctrine($conn);
         $object      = $this->getMockBuilder(BaseObject::class)
@@ -191,7 +195,7 @@ class DoctrineTest extends TestCase
             ->will($this->returnSelf());
         $query_builder->expects($this->once())
             ->method('where')
-            ->with('id = :id')
+            ->with('`id` = :id')
             ->will($this->returnSelf());
         $query_builder->expects($this->once())
             ->method('setParameter')
@@ -204,8 +208,51 @@ class DoctrineTest extends TestCase
         $conn->expects($this->once())
             ->method('createQueryBuilder')
             ->will($this->returnValue($query_builder));
+        $conn->expects($this->once())
+            ->method('quoteIdentifier')
+            ->with('id')
+            ->will($this->returnValue('`id`'));
 
         $backend->save($object);
+    }
+
+    public function testDelete()
+    {
+        $conn       = $this->getMockBuilder(Connection::class)
+            ->disableOriginalConstructor()
+            ->setMethods(['createQueryBuilder', 'insert', 'lastInsertId', 'beginTransaction',
+                'commit', 'rollBack', 'quoteIdentifier'])
+            ->getMock();
+        $backend    = new Doctrine($conn);
+        $object     = $this->getMockForAbstractClass(BaseObject::class, [$backend]);
+        $object->id = 1;
+
+        $query_builder = $this->createMock(\Doctrine\DBAL\Query\QueryBuilder::class);
+        $query_builder->expects($this->once())
+            ->method('delete')
+            ->with(snake_case(get_class($object)))
+            ->will($this->returnSelf());
+        $query_builder->expects($this->once())
+            ->method('where')
+            ->with('`id` = :id')
+            ->will($this->returnSelf());
+        $query_builder->expects($this->once())
+            ->method('setParameter')
+            ->with('id', 1)
+            ->will($this->returnSelf());
+        $query_builder->expects($this->once())
+            ->method('execute')
+            ->will($this->returnValue(1));
+
+        $conn->expects($this->once())
+            ->method('createQueryBuilder')
+            ->will($this->returnValue($query_builder));
+        $conn->expects($this->once())
+            ->method('quoteIdentifier')
+            ->with('id')
+            ->will($this->returnValue('`id`'));
+
+        $backend->delete($object);
     }
 
     /**

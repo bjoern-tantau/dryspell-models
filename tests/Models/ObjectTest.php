@@ -1,7 +1,12 @@
 <?php
 namespace Dryspell\Tests\Models;
 
-use \PHPunit\Framework\TestCase;
+use DateTime;
+use DateTimeZone;
+use Dryspell\Models\BackendInterface;
+use Dryspell\Models\BaseObject;
+use Generator;
+use PHPunit\Framework\TestCase;
 
 /**
  * Tests for base model object
@@ -20,8 +25,8 @@ class ObjectTest extends TestCase
      */
     public function testGetProperties()
     {
-        $backend  = $this->getMockBuilder(\Dryspell\Models\BackendInterface::class)->getMock();
-        $object   = $this->getMockForAbstractClass(\Dryspell\Models\BaseObject::class,
+        $backend  = $this->getMockBuilder(BackendInterface::class)->getMock();
+        $object   = $this->getMockForAbstractClass(BaseObject::class,
             [$backend]);
         $actual   = $object->getProperties();
         $expected = [
@@ -51,8 +56,8 @@ class ObjectTest extends TestCase
      */
     public function testGetIdProperty()
     {
-        $backend  = $this->getMockBuilder(\Dryspell\Models\BackendInterface::class)->getMock();
-        $object   = $this->getMockForAbstractClass(\Dryspell\Models\BaseObject::class,
+        $backend  = $this->getMockBuilder(BackendInterface::class)->getMock();
+        $object   = $this->getMockForAbstractClass(BaseObject::class,
             [$backend]);
         $actual   = $object::getIdProperty();
         $expected = 'id';
@@ -68,12 +73,12 @@ class ObjectTest extends TestCase
     {
         $values = [
             'id'         => 1,
-            'created_at' => new \DateTime('2000-01-01'),
-            'updated_at' => new \DateTime('2000-01-01'),
+            'created_at' => new DateTime('2000-01-01'),
+            'updated_at' => new DateTime('2000-01-01'),
         ];
 
-        $backend = $this->getMockBuilder(\Dryspell\Models\BackendInterface::class)->getMock();
-        $object  = $this->getMockForAbstractClass(\Dryspell\Models\BaseObject::class,
+        $backend = $this->getMockBuilder(BackendInterface::class)->getMock();
+        $object  = $this->getMockForAbstractClass(BaseObject::class,
             [$backend]);
         $object->setValues($values);
         $actual  = $object->getValues();
@@ -89,18 +94,18 @@ class ObjectTest extends TestCase
     {
         $values = [
             'id'         => 1,
-            'created_at' => new \DateTime('2000-01-01'),
-            'updated_at' => new \DateTime('2000-01-01'),
+            'created_at' => new DateTime('2000-01-01'),
+            'updated_at' => new DateTime('2000-01-01'),
         ];
 
-        $backend = $this->getMockBuilder(\Dryspell\Models\BackendInterface::class)->getMock();
-        $object  = $this->getMockForAbstractClass(\Dryspell\Models\BaseObject::class,
+        $backend = $this->getMockBuilder(BackendInterface::class)->getMock();
+        $object  = $this->getMockForAbstractClass(BaseObject::class,
             [$backend]);
         $actual  = $object->setValues($values);
         $this->assertEquals($object, $actual);
         $this->assertEquals(1, $actual->id);
-        $this->assertInstanceOf(\DateTime::class, $actual->created_at);
-        $this->assertInstanceOf(\DateTime::class, $actual->updated_at);
+        $this->assertInstanceOf(DateTime::class, $actual->created_at);
+        $this->assertInstanceOf(DateTime::class, $actual->updated_at);
         $this->assertEquals('2000-01-01', $actual->created_at->format('Y-m-d'));
         $this->assertEquals('2000-01-01', $actual->updated_at->format('Y-m-d'));
     }
@@ -112,8 +117,8 @@ class ObjectTest extends TestCase
      */
     public function testSave()
     {
-        $backend  = $this->getMockBuilder(\Dryspell\Models\BackendInterface::class)->getMock();
-        $object   = $this->getMockForAbstractClass(\Dryspell\Models\BaseObject::class,
+        $backend  = $this->getMockBuilder(BackendInterface::class)->getMock();
+        $object   = $this->getMockForAbstractClass(BaseObject::class,
             [$backend]);
         $backend->expects($this->once())
             ->method('save')
@@ -131,8 +136,8 @@ class ObjectTest extends TestCase
      */
     public function testFind()
     {
-        $backend = $this->getMockBuilder(\Dryspell\Models\BackendInterface::class)->getMock();
-        $object  = $this->getMockForAbstractClass(\Dryspell\Models\BaseObject::class,
+        $backend = $this->getMockBuilder(BackendInterface::class)->getMock();
+        $object  = $this->getMockForAbstractClass(BaseObject::class,
             [$backend]);
         $obj2    = clone $object;
         $obj3    = clone $object;
@@ -143,27 +148,27 @@ class ObjectTest extends TestCase
             ->will($this->returnValue([
                     $obj2->setValues([
                         'id'         => 2,
-                        'created_at' => new \DateTime('2000-01-01'),
-                        'updated_at' => new \DateTime('2000-01-01'),
+                        'created_at' => new DateTime('2000-01-01'),
+                        'updated_at' => new DateTime('2000-01-01'),
                     ]),
                     $obj3->setValues([
                         'id'         => 3,
-                        'created_at' => new \DateTime('2000-01-01'),
-                        'updated_at' => new \DateTime('2000-01-01'),
+                        'created_at' => new DateTime('2000-01-01'),
+                        'updated_at' => new DateTime('2000-01-01'),
                     ]),
                     $obj4->setValues([
                         'id'         => 4,
-                        'created_at' => new \DateTime('2000-01-01'),
-                        'updated_at' => new \DateTime('2000-01-01'),
+                        'created_at' => new DateTime('2000-01-01'),
+                        'updated_at' => new DateTime('2000-01-01'),
                     ]),
         ]));
         $actual  = $object->find(['id' => ['>' => 1]]);
-        $this->assertInstanceOf(\Generator::class, $actual);
+        $this->assertInstanceOf(Generator::class, $actual);
         $values  = [];
         foreach ($actual as $object) {
-            $this->assertInstanceOf(\Dryspell\Models\BaseObject::class, $object);
-            $this->assertInstanceOf(\DateTime::class, $object->created_at);
-            $this->assertInstanceOf(\DateTime::class, $object->updated_at);
+            $this->assertInstanceOf(BaseObject::class, $object);
+            $this->assertInstanceOf(DateTime::class, $object->created_at);
+            $this->assertInstanceOf(DateTime::class, $object->updated_at);
             $this->assertEquals('2000-01-01',
                 $object->created_at->format('Y-m-d'));
             $this->assertEquals('2000-01-01',
@@ -183,8 +188,8 @@ class ObjectTest extends TestCase
      */
     public function testLoad()
     {
-        $backend = $this->getMockBuilder(\Dryspell\Models\BackendInterface::class)->getMock();
-        $object  = $this->getMockForAbstractClass(\Dryspell\Models\BaseObject::class,
+        $backend = $this->getMockBuilder(BackendInterface::class)->getMock();
+        $object  = $this->getMockForAbstractClass(BaseObject::class,
             [$backend]);
         $backend->expects($this->once())
             ->method('find')
@@ -192,15 +197,15 @@ class ObjectTest extends TestCase
             ->will($this->returnValue([
                     [
                         'id'         => 1,
-                        'created_at' => new \DateTime('2000-01-01'),
-                        'updated_at' => new \DateTime('2000-01-01'),
+                        'created_at' => new DateTime('2000-01-01'),
+                        'updated_at' => new DateTime('2000-01-01'),
                     ],
         ]));
         $actual  = $object->load(1);
         $this->assertEquals($object, $actual);
         $this->assertEquals(1, $actual->id);
-        $this->assertInstanceOf(\DateTime::class, $actual->created_at);
-        $this->assertInstanceOf(\DateTime::class, $actual->updated_at);
+        $this->assertInstanceOf(DateTime::class, $actual->created_at);
+        $this->assertInstanceOf(DateTime::class, $actual->updated_at);
         $this->assertEquals('2000-01-01', $actual->created_at->format('Y-m-d'));
         $this->assertEquals('2000-01-01', $actual->updated_at->format('Y-m-d'));
     }
@@ -214,12 +219,12 @@ class ObjectTest extends TestCase
     {
         $values = [
             'id'         => 1,
-            'created_at' => new \DateTime('2000-01-01'),
-            'updated_at' => new \DateTime('2000-01-01'),
+            'created_at' => new DateTime('2000-01-01'),
+            'updated_at' => new DateTime('2000-01-01'),
         ];
 
-        $backend = $this->getMockBuilder(\Dryspell\Models\BackendInterface::class)->getMock();
-        $object  = $this->getMockForAbstractClass(\Dryspell\Models\BaseObject::class,
+        $backend = $this->getMockBuilder(BackendInterface::class)->getMock();
+        $object  = $this->getMockForAbstractClass(BaseObject::class,
             [$backend]);
         $object->setValues($values);
 
@@ -235,18 +240,18 @@ class ObjectTest extends TestCase
      */
     public function testSetWeaklyTyped()
     {
-        $backend = $this->getMockBuilder(\Dryspell\Models\BackendInterface::class)->getMock();
-        /** @var \Dryspell\Models\BaseObject $object */
-        $object  = $this->getMockForAbstractClass(\Dryspell\Models\BaseObject::class,
+        $backend = $this->getMockBuilder(BackendInterface::class)->getMock();
+        /** @var BaseObject $object */
+        $object  = $this->getMockForAbstractClass(BaseObject::class,
             [$backend]);
 
         $object->setWeaklyTyped('created_at', '2000-01-01');
         $actual   = $object->created_at;
-        $expected = new \DateTime('2000-01-01');
+        $expected = new DateTime('2000-01-01');
 
         $this->assertEquals($expected, $actual);
 
-        $object = $this->getMockForAbstractClass(\Dryspell\Models\BaseObject::class,
+        $object = $this->getMockForAbstractClass(BaseObject::class,
             [$backend]);
 
         $object->setWeaklyTyped('created_at', [
@@ -254,10 +259,30 @@ class ObjectTest extends TestCase
             'timezone' => 'Europe/Berlin',
         ]);
         $actual   = $object->created_at;
-        $expected = new \DateTime('2000-01-01');
-        $timezone = new \DateTimeZone('Europe/Berlin');
+        $expected = new DateTime('2000-01-01');
+        $timezone = new DateTimeZone('Europe/Berlin');
         $expected->setTimezone($timezone);
 
+        $this->assertEquals($expected, $actual);
+    }
+
+    /**
+     * Is the object deleted using the backend?
+     *
+     * @test
+     */
+    public function testDelete()
+    {
+        $backend  = $this->getMockBuilder(BackendInterface::class)->getMock();
+        /** @var BaseObject $object */
+        $object   = $this->getMockForAbstractClass(BaseObject::class,
+            [$backend]);
+        $backend->expects($this->once())
+            ->method('delete')
+            ->with($object)
+            ->will($this->returnSelf());
+        $actual   = $object->delete();
+        $expected = $object;
         $this->assertEquals($expected, $actual);
     }
 }

@@ -1,5 +1,4 @@
 <?php
-
 namespace Dryspell\Models;
 
 use Iterator;
@@ -59,6 +58,13 @@ interface ObjectInterface extends Iterator
      * @return ObjectInterface
      */
     public function save(): self;
+
+    /**
+     * Remove the object via the backend.
+     *
+     * @return ObjectInterface
+     */
+    public function delete(): self;
 
     /**
      * Find many instances of the object with the given criteria.
