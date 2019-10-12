@@ -131,6 +131,15 @@ class Doctrine implements BackendInterface
                     $value = unserialize($value);
                 }
                 break;
+            case \DateTime::class:
+                if (is_numeric($value)) {
+                    $date = new \DateTime();
+                    $date->setTimestamp($value);
+                    $value = $date;
+                } else {
+                    $value = new \DateTime($value);
+                }
+                break;
             default:
                 $value = new $options['type']($value);
                 break;
