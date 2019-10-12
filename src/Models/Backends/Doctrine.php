@@ -75,14 +75,15 @@ class Doctrine implements BackendInterface
     {
         $table = $this->getTableName($object);
         $this->conn->transactional(function(Connection $conn) use ($table, $object) {
-            if ($id = $object->{$object->getIdProperty()}) {
+            $values = array_map([$this, 'getValueForDatabase'], $object->getValues());
+            if ($id     = $object->{$object->getIdProperty()}) {
                 $query = $conn->createQueryBuilder();
                 $query->select($object->getIdProperty())
                     ->from($table)
                     ->where($object->getIdProperty() . ' = :id')
                     ->setParameter('id', $id);
                 if ($id == $query->execute()->fetchColumn()) {
-                    $conn->update($table, $object->getValues(),
+                    $conn->update($table, $values,
                         [$object->getIdProperty() => $id]);
                     return;
                 }
@@ -91,7 +92,7 @@ class Doctrine implements BackendInterface
             }
 
             $conn->insert($table,
-                array_filter($object->getValues(),
+                array_filter($values,
                     function($value) {
                     return !is_null($value);
                 }));
@@ -108,7 +109,7 @@ class Doctrine implements BackendInterface
         return snake_case($reflect->getShortName());
     }
 
-    private function setProperty(BaseObject $object, string $property, $value)
+    private function setProperty(ObjectInterface $object, string $property, $value)
     {
         $options = $object->getProperties()[$property];
         switch ($options['type']) {
@@ -133,7 +134,7 @@ class Doctrine implements BackendInterface
                 break;
             case '\\' . \DateTime::class:
                 if (is_numeric($value)) {
-                    $date = new \DateTime();
+                    $date  = new \DateTime();
                     $date->setTimestamp($value);
                     $value = $date;
                 } else {
@@ -146,5 +147,22 @@ class Doctrine implements BackendInterface
         }
         $object->$property = $value;
         return $this;
+    }
+
+    private function getValueForDatabase($value)
+    {
+        if ($value instanceof ObjectInterface) {
+            $value = $value->{$value->getIdProperty()};
+        }
+        if ($value instanceof \DateTime) {
+            $value = $value->format("Y-m-d H:i:s");
+        }
+        if (is_object($value)) {
+            $value = strval($value);
+        }
+        if (is_array($value)) {
+            $value = serialize($value);
+        }
+        return $value;
     }
 }

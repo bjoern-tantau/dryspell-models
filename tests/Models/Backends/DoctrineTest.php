@@ -42,21 +42,25 @@ class DoctrineTest extends TestCase
         $object->expects($this->any())
             ->method('getProperties')
             ->will($this->returnValue([
-                    'id'  => [
+                    'id'         => [
                         'type'            => 'int',
                         'id'              => true,
                         'generated_value' => true,
                         'unsigned'        => true,
                     ],
-                    'foo' => [
+                    'foo'        => [
                         'type' => 'string',
+                    ],
+                    'created_at' => [
+                        'type' => \DateTime::class,
                     ],
         ]));
         $object->foo = 'bar';
+        $object->created_at = new \DateTime('2000-01-01');
 
         $conn->expects($this->once())
             ->method('insert')
-            ->with(snake_case(get_class($object)), ['foo' => 'bar']);
+            ->with(snake_case(get_class($object)), ['foo' => 'bar', 'created_at' => '2000-01-01 00:00:00']);
         $conn->expects($this->once())
             ->method('lastInsertId')
             ->will($this->returnValue(1));
