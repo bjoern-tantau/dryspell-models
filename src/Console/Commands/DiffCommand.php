@@ -6,6 +6,8 @@ use Dryspell\Migrations\SchemaProvider;
 use Dryspell\Models\ObjectInterface;
 use hanneskod\classtools\Iterator\ClassIterator;
 use Psr\Container\ContainerInterface;
+use ReflectionClass;
+use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -54,7 +56,7 @@ class DiffCommand extends DoctrineDiffCommand
         parent::configure();
 
         $this
-            ->addOption('models-path', null, InputOption::VALUE_REQUIRED, 'Directory, containing all models to generate migrations for.', getcwd())
+            ->addArgument('models-path', InputArgument::REQUIRED, 'Directory, containing all models to generate migrations for.')
             ->addOption('models-namespace', null, InputOption::VALUE_REQUIRED, 'Namespace, containing all models to generate migrations for.')
             ->addOption('models-interface', null, InputOption::VALUE_REQUIRED, 'Interface, all models implement that should be migrations generated for.', ObjectInterface::class)
         ;
@@ -62,12 +64,12 @@ class DiffCommand extends DoctrineDiffCommand
 
     public function execute(InputInterface $input, OutputInterface $output)
     {
-        $classes = new ClassIterator($this->finder->in($input->getOption('models-path')));
+        $classes = new ClassIterator($this->finder->in($input->getArgument('models-path')));
         if ($input->hasOption('models-namespace')) {
             $classes = $classes->inNamespace($input->getOption('models-namespace'));
         }
         foreach ($classes->type($input->getOption('models-interface')) as $class) {
-            /* @var $class \ReflectionClass */
+            /* @var $class ReflectionClass */
             if ($class->isInstantiable()) {
                 $object = $this->container->get($class->getName());
                 $this->schemaProvider->addObject($object);
