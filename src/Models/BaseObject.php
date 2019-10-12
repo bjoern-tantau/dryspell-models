@@ -1,6 +1,9 @@
 <?php
-
 namespace Dryspell\Models;
+
+use DateTime;
+use Dryspell\Traits\AnnotationProperties;
+use JsonSerializable;
 
 /**
  * Abstract object to be used for all models.
@@ -8,13 +11,14 @@ namespace Dryspell\Models;
  * @author Björn Tantau <bjoern@bjoern-tantau.de>
  *
  * @property int $id Identifier @id, @GeneratedValue, @unsigned
- * @property \DateTime $created_at Time and date of creation. @default(now)
- * @property \DateTime $updated_at Time and date of last update. @default(now), @OnUpdate(now)
+ * @property DateTime $created_at Time and date of creation. @default(now)
+ * @property DateTime $updated_at Time and date of last update. @default(now), @OnUpdate(now)
  */
-abstract class BaseObject implements ObjectInterface
+abstract class BaseObject implements ObjectInterface, JsonSerializable
 {
 
-    use \Dryspell\Traits\AnnotationProperties;
+    use AnnotationProperties;
+
     /** @var string Property to be used as id of object. */
     protected static $id_property = 'id';
 
@@ -38,7 +42,7 @@ abstract class BaseObject implements ObjectInterface
     public function __construct(BackendInterface $backend)
     {
         $this->backend = $backend;
-        $this->keys = array_keys($this->getProperties());
+        $this->keys    = array_keys($this->getProperties());
     }
 
     /**
@@ -173,5 +177,17 @@ abstract class BaseObject implements ObjectInterface
     public function valid(): bool
     {
         return isset($this->keys[$this->current]);
+    }
+
+    /**
+     * Specify data which should be serialized to JSON
+     * <p>Serializes the object to a value that can be serialized natively by <code>json_encode()</code>.</p>
+     * @return mixed <p>Returns data which can be serialized by <code>json_encode()</code>, which is a value of any type other than a <code>resource</code>.</p>
+     * @link http://php.net/manual/en/jsonserializable.jsonserialize.php
+     * @since PHP 5 >= 5.4.0, PHP 7
+     */
+    public function jsonSerialize()
+    {
+        return $this->getValues();
     }
 }

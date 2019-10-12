@@ -1,5 +1,4 @@
 <?php
-
 namespace Dryspell\Tests\Models;
 
 use \PHPunit\Framework\TestCase;
@@ -21,10 +20,10 @@ class ObjectTest extends TestCase
      */
     public function testGetProperties()
     {
-        $backend = $this->getMockBuilder(\Dryspell\Models\BackendInterface::class)->getMock();
-        $object = $this->getMockForAbstractClass(\Dryspell\Models\BaseObject::class,
+        $backend  = $this->getMockBuilder(\Dryspell\Models\BackendInterface::class)->getMock();
+        $object   = $this->getMockForAbstractClass(\Dryspell\Models\BaseObject::class,
             [$backend]);
-        $actual = $object->getProperties();
+        $actual   = $object->getProperties();
         $expected = [
             'id'         => [
                 'type'            => 'int',
@@ -52,10 +51,10 @@ class ObjectTest extends TestCase
      */
     public function testGetIdProperty()
     {
-        $backend = $this->getMockBuilder(\Dryspell\Models\BackendInterface::class)->getMock();
-        $object = $this->getMockForAbstractClass(\Dryspell\Models\BaseObject::class,
+        $backend  = $this->getMockBuilder(\Dryspell\Models\BackendInterface::class)->getMock();
+        $object   = $this->getMockForAbstractClass(\Dryspell\Models\BaseObject::class,
             [$backend]);
-        $actual = $object::getIdProperty();
+        $actual   = $object::getIdProperty();
         $expected = 'id';
         $this->assertEquals($expected, $actual);
     }
@@ -74,10 +73,10 @@ class ObjectTest extends TestCase
         ];
 
         $backend = $this->getMockBuilder(\Dryspell\Models\BackendInterface::class)->getMock();
-        $object = $this->getMockForAbstractClass(\Dryspell\Models\BaseObject::class,
+        $object  = $this->getMockForAbstractClass(\Dryspell\Models\BaseObject::class,
             [$backend]);
         $object->setValues($values);
-        $actual = $object->getValues();
+        $actual  = $object->getValues();
         $this->assertEquals($values, $actual);
     }
 
@@ -95,9 +94,9 @@ class ObjectTest extends TestCase
         ];
 
         $backend = $this->getMockBuilder(\Dryspell\Models\BackendInterface::class)->getMock();
-        $object = $this->getMockForAbstractClass(\Dryspell\Models\BaseObject::class,
+        $object  = $this->getMockForAbstractClass(\Dryspell\Models\BaseObject::class,
             [$backend]);
-        $actual = $object->setValues($values);
+        $actual  = $object->setValues($values);
         $this->assertEquals($object, $actual);
         $this->assertEquals(1, $actual->id);
         $this->assertInstanceOf(\DateTime::class, $actual->created_at);
@@ -113,14 +112,14 @@ class ObjectTest extends TestCase
      */
     public function testSave()
     {
-        $backend = $this->getMockBuilder(\Dryspell\Models\BackendInterface::class)->getMock();
-        $object = $this->getMockForAbstractClass(\Dryspell\Models\BaseObject::class,
+        $backend  = $this->getMockBuilder(\Dryspell\Models\BackendInterface::class)->getMock();
+        $object   = $this->getMockForAbstractClass(\Dryspell\Models\BaseObject::class,
             [$backend]);
         $backend->expects($this->once())
             ->method('save')
             ->with($object)
             ->will($this->returnSelf());
-        $actual = $object->save();
+        $actual   = $object->save();
         $expected = $object;
         $this->assertEquals($expected, $actual);
     }
@@ -133,11 +132,11 @@ class ObjectTest extends TestCase
     public function testFind()
     {
         $backend = $this->getMockBuilder(\Dryspell\Models\BackendInterface::class)->getMock();
-        $object = $this->getMockForAbstractClass(\Dryspell\Models\BaseObject::class,
+        $object  = $this->getMockForAbstractClass(\Dryspell\Models\BaseObject::class,
             [$backend]);
-        $obj2 = clone $object;
-        $obj3 = clone $object;
-        $obj4 = clone $object;
+        $obj2    = clone $object;
+        $obj3    = clone $object;
+        $obj4    = clone $object;
         $backend->expects($this->once())
             ->method('find')
             ->with($object, ['id' => ['>' => 1]])
@@ -158,9 +157,9 @@ class ObjectTest extends TestCase
                         'updated_at' => new \DateTime('2000-01-01'),
                     ]),
         ]));
-        $actual = $object->find(['id' => ['>' => 1]]);
+        $actual  = $object->find(['id' => ['>' => 1]]);
         $this->assertInstanceOf(\Generator::class, $actual);
-        $values = [];
+        $values  = [];
         foreach ($actual as $object) {
             $this->assertInstanceOf(\Dryspell\Models\BaseObject::class, $object);
             $this->assertInstanceOf(\DateTime::class, $object->created_at);
@@ -185,7 +184,7 @@ class ObjectTest extends TestCase
     public function testLoad()
     {
         $backend = $this->getMockBuilder(\Dryspell\Models\BackendInterface::class)->getMock();
-        $object = $this->getMockForAbstractClass(\Dryspell\Models\BaseObject::class,
+        $object  = $this->getMockForAbstractClass(\Dryspell\Models\BaseObject::class,
             [$backend]);
         $backend->expects($this->once())
             ->method('find')
@@ -197,12 +196,35 @@ class ObjectTest extends TestCase
                         'updated_at' => new \DateTime('2000-01-01'),
                     ],
         ]));
-        $actual = $object->load(1);
+        $actual  = $object->load(1);
         $this->assertEquals($object, $actual);
         $this->assertEquals(1, $actual->id);
         $this->assertInstanceOf(\DateTime::class, $actual->created_at);
         $this->assertInstanceOf(\DateTime::class, $actual->updated_at);
         $this->assertEquals('2000-01-01', $actual->created_at->format('Y-m-d'));
         $this->assertEquals('2000-01-01', $actual->updated_at->format('Y-m-d'));
+    }
+
+    /**
+     * Can the object be serialized to json?
+     *
+     * @test
+     */
+    public function testJsonEncode()
+    {
+        $values = [
+            'id'         => 1,
+            'created_at' => new \DateTime('2000-01-01'),
+            'updated_at' => new \DateTime('2000-01-01'),
+        ];
+
+        $backend = $this->getMockBuilder(\Dryspell\Models\BackendInterface::class)->getMock();
+        $object  = $this->getMockForAbstractClass(\Dryspell\Models\BaseObject::class,
+            [$backend]);
+        $object->setValues($values);
+
+        $actual = json_encode($object);
+        $expected = json_encode($values);
+        $this->assertEquals($expected, $actual);
     }
 }
