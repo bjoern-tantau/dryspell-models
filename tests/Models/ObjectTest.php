@@ -35,15 +35,18 @@ class ObjectTest extends TestCase
                 'id'              => true,
                 'generated_value' => true,
                 'unsigned'        => true,
+                'required'        => false,
             ],
             'created_at' => [
-                'type'    => '\\DateTime',
-                'default' => 'now',
+                'type'     => '\\DateTime',
+                'default'  => 'now',
+                'required' => false,
             ],
             'updated_at' => [
                 'type'      => '\\DateTime',
                 'default'   => 'now',
                 'on_update' => 'now',
+                'required'  => false,
             ],
         ];
         $this->assertEquals($expected, $actual);

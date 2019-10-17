@@ -1,5 +1,4 @@
 <?php
-
 namespace Dryspell\Traits;
 
 use Dryspell\InvalidTypeException;
@@ -15,6 +14,7 @@ trait AnnotationProperties
 {
 
     use MagicProperties;
+
     protected $available_options = [
         'default'         => true,
         'generated_value' => true,
@@ -51,7 +51,7 @@ trait AnnotationProperties
 
         $factory = \phpDocumentor\Reflection\DocBlockFactory::createInstance();
 
-        $reflection = new \Dryspell\ExtendedReflectionClass($this);
+        $reflection  = new \Dryspell\ExtendedReflectionClass($this);
         $reflections = [];
         do {
             $reflections[] = $reflection;
@@ -74,10 +74,12 @@ trait AnnotationProperties
                             $type = $namespaced_type;
                         }
                     }
-                    $options = [
-                        'type' => $type,
+                    $options                                  = [
+                        'type'     => $type,
+                        'required' => is_subclass_of($type, ObjectInterface::class) || is_a($type,
+                            ObjectInterface::class, true),
                     ];
-                    $options = array_merge($options,
+                    $options                                  = array_merge($options,
                         $this->getOptions((string) $property->getDescription()));
                     $properties[$property->getVariableName()] = $options;
                 }
@@ -99,7 +101,7 @@ trait AnnotationProperties
     protected function getOptions(string $desc): array
     {
         $options = [];
-        $regex = '/@([a-z_]+)(\(([a-z0-9]+)\))?/i';
+        $regex   = '/@([a-z_]+)(\(([a-z0-9]+)\))?/i';
         if (preg_match_all($regex, $desc, $matches)) {
             foreach ($matches[1] as $i => $key) {
                 $key = snake_case($key);

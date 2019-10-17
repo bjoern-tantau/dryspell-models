@@ -63,7 +63,7 @@ class MagicPropertiesTest extends TestCase
         $properties->setValue($mock, ['foo' => ['type' => $type]]);
 
         $this->expectException(\Dryspell\InvalidTypeException::class);
-        $this->expectExceptionMessageRegExp('/::foo must be of type ' . preg_quote($type) . ', ' . preg_quote($givenType) . ' given.$/');
+        $this->expectExceptionMessageRegExp('/::foo must be of type ' . preg_quote($type) . '.$/');
         $mock->foo = $value;
     }
 

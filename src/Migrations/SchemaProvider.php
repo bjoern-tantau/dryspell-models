@@ -60,7 +60,7 @@ class SchemaProvider implements SchemaProviderInterface
 
     /**
      * Add object to stack
-     * 
+     *
      * @param ObjectInterface $object
      */
     public function addObject(ObjectInterface $object)
@@ -91,7 +91,7 @@ class SchemaProvider implements SchemaProviderInterface
                     $foreign_table = $this->getTableName($options['type']);
                     $foreign_key   = call_user_func($options['type'] . '::getIdProperty');
                     $on_update     = 'CASCADE';
-                    $on_delete     = 'CASCADE';
+                    $on_delete     = $options['required'] ? 'CASCADE' : 'SET NULL';
                     $table->addForeignKeyConstraint($foreign_table, [$column_name],
                         [$foreign_key],
                         ['onUpdate' => $on_update, 'onDelete' => $on_delete]);
@@ -166,6 +166,7 @@ class SchemaProvider implements SchemaProviderInterface
                 $out[$option] = $value;
             }
         }
+        $out['notnull'] = $options['required'] ?? false;
         if (is_subclass_of($options['type'], ObjectInterface::class) || is_a($options['type'],
                 ObjectInterface::class, true)) {
             $out['unsigned'] = true;

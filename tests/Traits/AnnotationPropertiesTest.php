@@ -1,5 +1,4 @@
 <?php
-
 namespace Dryspell\Tests\Traits;
 
 use \Dryspell\Traits\AnnotationProperties;
@@ -22,7 +21,7 @@ class AnnotationPropertiesTest extends TestCase
      */
     public function testGetProperties()
     {
-        $object = new AnnotationPropertiesTestClass();
+        $object   = new AnnotationPropertiesTestClass();
         $expected = [
             'foo' => [
                 'type'     => 'string',
@@ -32,30 +31,37 @@ class AnnotationPropertiesTest extends TestCase
             ],
             'bar' => [
                 'type'            => 'int',
+                'required'        => false,
                 'id'              => true,
                 'generated_value' => true,
                 'unsigned'        => true,
             ],
         ];
-        $actual = $object->getProperties();
+        $actual   = $object->getProperties();
         $this->assertEquals($expected, $actual);
 
-        $object = new AnnotationPropertiesTestClassChild();
+        $object   = new AnnotationPropertiesTestClassChild();
         $expected = [
-            'foo' => [
+            'foo'         => [
                 'type'     => 'string',
                 'default'  => 'foobar',
                 'length'   => 255,
                 'required' => true,
             ],
-            'bar' => [
-                'type' => 'string',
+            'bar'         => [
+                'type'     => 'string',
+                'required' => false,
             ],
-            'baz' => [
-                'type' => '\Dryspell\Tests\Traits\AnnotationPropertiesTestClass',
+            'baz'         => [
+                'type'     => '\Dryspell\Tests\Traits\AnnotationPropertiesTestClass',
+                'required' => false,
+            ],
+            'bazRequired' => [
+                'type'     => '\Dryspell\Tests\Traits\AnnotationPropertiesTestClass',
+                'required' => true,
             ],
         ];
-        $actual = $object->getProperties();
+        $actual   = $object->getProperties();
         $this->assertEquals($expected, $actual);
     }
 }
@@ -79,7 +85,8 @@ class AnnotationPropertiesTestClass
  *
  * @author Björn Tantau <bjoern@bjoern-tantau.de>
  *
- * @property AnnotationPropertiesTestClass $baz Baz property.
+ * @property AnnotationPropertiesTestClass $baz Baz property is nullable.
+ * @property AnnotationPropertiesTestClass $bazRequired BazRequired property is not nullable. @required
  * @property string $bar Bar property, this time as string.
  */
 class AnnotationPropertiesTestClassChild extends AnnotationPropertiesTestClass
