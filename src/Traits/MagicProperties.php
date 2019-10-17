@@ -1,5 +1,4 @@
 <?php
-
 namespace Dryspell\Traits;
 
 use Dryspell\InvalidTypeException;
@@ -54,7 +53,7 @@ trait MagicProperties
         if (!is_null($value)) {
             $type = $properties[$name]['type'];
             if (!$this->checkType($value, $type)) {
-                throw new InvalidTypeException(static::class . '::' . $name . ' must be of type ' . $type . ', ' . $this->getType($value) . ' given.');
+                throw new InvalidTypeException(static::class . '::' . $name . ' must be of type ' . $type . '.');
             }
         }
         $method = camel_case('set_' . $name);
@@ -146,19 +145,4 @@ trait MagicProperties
         }
         return true;
     }
-
-    /**
-     * Get type or class of value.
-     *
-     * @param mixed $value
-     * @return string
-     */
-    protected function getType($value)
-    {
-        if (is_object($value)) {
-            return get_class($value);
-        }
-        return gettype($value);
-    }
-
 }
