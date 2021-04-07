@@ -269,20 +269,23 @@ class DoctrineTest extends TestCase
             ->getMock();
         $backend = new Doctrine($conn);
         $object  = $this->getMockBuilder(BaseObject::class)
-            ->disableOriginalConstructor()
+            ->setConstructorArgs([$backend])
             ->setMethods(['getProperties'])
-            ->getMock();
+            ->getMockForAbstractClass();
         $object->expects($this->any())
             ->method('getProperties')
             ->will($this->returnValue([
-                    'id'  => [
+                    'id'    => [
                         'type'            => 'int',
                         'id'              => true,
                         'generated_value' => true,
                         'unsigned'        => true,
                     ],
-                    'foo' => [
+                    'foo'   => [
                         'type' => 'string',
+                    ],
+                    'child' => [
+                        'type' => DoctrineTestClassChild::class,
                     ],
         ]));
 
@@ -290,7 +293,7 @@ class DoctrineTest extends TestCase
         $stmt->expects($this->once())
             ->method('fetch')
             ->with(PDO::FETCH_ASSOC)
-            ->willReturn(['id' => 1, 'foo' => 'bar']);
+            ->willReturn(['id' => 1, 'foo' => 'bar', 'child_id' => 2]);
 
         $query_builder = $this->createMock(\Doctrine\DBAL\Query\QueryBuilder::class);
         $query_builder->expects($this->once())
@@ -323,11 +326,21 @@ class DoctrineTest extends TestCase
 
         $term   = 1;
         $actual = $backend->find($object, $term);
-        /* @var $actual \Geanerator */
+        /* @var $actual \Generator */
         $this->assertInstanceOf(Generator::class, $actual);
         $actual = $actual->current();
         $this->assertInstanceOf(BaseObject::class, $actual);
         $this->assertEquals(1, $actual->id);
         $this->assertEquals('bar', $actual->foo);
     }
+}
+
+/**
+ * Description of DoctrineTestClassChild
+ *
+ * @author Björn Tantau <bjoern@bjoern-tantau.de>
+ */
+class DoctrineTestClassChild extends BaseObject
+{
+
 }

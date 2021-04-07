@@ -140,6 +140,10 @@ abstract class BaseObject implements ObjectInterface, JsonSerializable
 
     public function setWeaklyTyped(string $name, $value): \Dryspell\Models\ObjectInterface
     {
+        $properties = $this->getProperties();
+        if (!isset($properties[$name])) {
+            $name = preg_replace('/_id$/', '', $name);
+        }
         $this->$name = $this->convertValueForProperty($name, $value);
         return $this;
     }
@@ -222,7 +226,11 @@ abstract class BaseObject implements ObjectInterface, JsonSerializable
      */
     private function convertValueForProperty(string $name, $value)
     {
-        $options = $this->getProperties()[$name];
+        $properties = $this->getProperties();
+        if (!isset($properties[$name])) {
+            $name = preg_replace('/_id$/', '', $name);
+        }
+        $options = $properties[$name];
         switch ($options['type']) {
             case 'bool':
             case 'boolean':
@@ -263,7 +271,14 @@ abstract class BaseObject implements ObjectInterface, JsonSerializable
                 }
                 break;
             default:
-                $value = new $options['type']($value);
+                if (is_a($options['type'], self::class, true)) {
+                    /* @var $object BaseObject */
+                    $object     = new $options['type']($this->backend);
+                    $object->{$object->getIdProperty()} = $value;
+                    $value = $object;
+                } else {
+                    $value = new $options['type']($value);
+                }
                 break;
         }
         return $value;

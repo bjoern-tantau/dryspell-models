@@ -26,8 +26,7 @@ class ObjectTest extends TestCase
     public function testGetProperties()
     {
         $backend  = $this->getMockBuilder(BackendInterface::class)->getMock();
-        $object   = $this->getMockForAbstractClass(BaseObject::class,
-            [$backend]);
+        $object   = new ObjectTestClass($backend);
         $actual   = $object->getProperties();
         $expected = [
             'id'         => [
@@ -47,6 +46,10 @@ class ObjectTest extends TestCase
                 'default'   => 'now',
                 'on_update' => 'now',
                 'required'  => false,
+            ],
+            'child'      => [
+                'type'     => '\\' . ObjectTestClass::class,
+                'required' => false,
             ],
         ];
         $this->assertEquals($expected, $actual);
@@ -244,15 +247,17 @@ class ObjectTest extends TestCase
     public function testSetWeaklyTyped()
     {
         $backend = $this->getMockBuilder(BackendInterface::class)->getMock();
-        /** @var BaseObject $object */
-        $object  = $this->getMockForAbstractClass(BaseObject::class,
-            [$backend]);
+        $object  = new ObjectTestClass($backend);
 
         $object->setWeaklyTyped('created_at', '2000-01-01');
         $actual   = $object->created_at;
         $expected = new DateTime('2000-01-01');
 
         $this->assertEquals($expected, $actual);
+
+        $object->setWeaklyTyped('child_id', 1);
+        $actual = $object->child;
+        $this->assertInstanceOf(ObjectTestClass::class, $actual);
 
         $object = $this->getMockForAbstractClass(BaseObject::class,
             [$backend]);
@@ -288,4 +293,12 @@ class ObjectTest extends TestCase
         $expected = $object;
         $this->assertEquals($expected, $actual);
     }
+}
+
+/**
+ * @property ObjectTestClass $child
+ */
+class ObjectTestClass extends BaseObject
+{
+
 }

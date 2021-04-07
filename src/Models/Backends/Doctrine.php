@@ -111,41 +111,7 @@ class Doctrine implements BackendInterface
 
     private function setProperty(ObjectInterface $object, string $property, $value)
     {
-        $options = $object->getProperties()[$property];
-        switch ($options['type']) {
-            case 'bool':
-            case 'boolean':
-                $value = boolval($value);
-                break;
-            case 'int':
-            case 'integer':
-                $value = intval($value);
-                break;
-            case 'float':
-                $value = floatval($value);
-                break;
-            case 'string':
-                // Usually already a string
-                break;
-            case 'array':
-                if (is_string($value)) {
-                    $value = unserialize($value);
-                }
-                break;
-            case '\\' . DateTime::class:
-                if (is_numeric($value)) {
-                    $date  = new DateTime();
-                    $date->setTimestamp($value);
-                    $value = $date;
-                } else {
-                    $value = new DateTime($value);
-                }
-                break;
-            default:
-                $value = new $options['type']($value);
-                break;
-        }
-        $object->$property = $value;
+        $object->setWeaklyTyped($property, $value);
         return $this;
     }
 
