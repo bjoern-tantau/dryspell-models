@@ -2,13 +2,13 @@
 namespace Dryspell\Migrations;
 
 use DateTime;
-use Doctrine\DBAL\Migrations\Provider\SchemaProviderInterface;
 use Doctrine\DBAL\Schema\Schema;
+use Doctrine\Migrations\Provider\SchemaProvider as SchemaProviderInterface;
 use Dryspell\InvalidTypeException;
 use Dryspell\Models\ObjectInterface;
+use Illuminate\Support\Str;
 use ReflectionClass;
 use RtLopez\Decimal;
-use function snake_case;
 
 /**
  * A schema provider that uses the dryspell ORM to generate schemas.
@@ -22,7 +22,7 @@ class SchemaProvider implements SchemaProviderInterface
      *
      * @var ObjectInterface[]
      */
-    private $objects = [];
+    private $objects         = [];
     private $type_map        = [
         DateTime::class        => 'datetimetz',
         ObjectInterface::class => 'integer',
@@ -107,7 +107,7 @@ class SchemaProvider implements SchemaProviderInterface
     private function getTableName($class)
     {
         $reflect = new ReflectionClass($class);
-        return snake_case($reflect->getShortName());
+        return Str::snake($reflect->getShortName());
     }
 
     private function getColumnName(string $property, array $options)

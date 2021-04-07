@@ -3,6 +3,7 @@ namespace Dryspell\Traits;
 
 use Dryspell\InvalidTypeException;
 use Dryspell\UndefinedPropertyException;
+use Illuminate\Support\Str;
 
 /**
  * Make getters and setters for virtual public properties available.
@@ -56,7 +57,7 @@ trait MagicProperties
                 throw new InvalidTypeException(static::class . '::' . $name . ' must be of type ' . $type . '.');
             }
         }
-        $method = camel_case('set_' . $name);
+        $method = Str::camel('set_' . $name);
         if (is_callable(array($this, $method))) {
             $this->$method($value);
         } else {
@@ -78,7 +79,7 @@ trait MagicProperties
             throw new UndefinedPropertyException('Undefined property: ' . static::class . '::' . $name);
         }
 
-        $method = camel_case('get_' . $name);
+        $method = Str::camel('get_' . $name);
         if (is_callable(array($this, $method))) {
             return $this->$method();
         } elseif (array_key_exists($name, $this->values)) {

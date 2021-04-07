@@ -5,7 +5,7 @@
          bootstrap="src/bootstrap.php"
          colors="true">
     <testsuites>
-        <testsuite>
+        <testsuite name="default">
             <directory>tests</directory>
         </testsuite>
     </testsuites>

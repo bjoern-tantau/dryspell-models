@@ -5,9 +5,9 @@ use DateTime;
 use Doctrine\DBAL\Connection;
 use Dryspell\Models\BackendInterface;
 use Dryspell\Models\ObjectInterface;
+use Illuminate\Support\Str;
 use PDO;
 use ReflectionClass;
-use function snake_case;
 
 /**
  * Model backend using the Doctrine DBAL.
@@ -74,7 +74,7 @@ class Doctrine implements BackendInterface
     public function save(ObjectInterface $object): BackendInterface
     {
         $table = $this->getTableName($object);
-        $this->conn->transactional(function(Connection $conn) use ($table, $object) {
+        $this->conn->transactional(function (Connection $conn) use ($table, $object) {
             $values = array_map([$this, 'getValueForDatabase'], $object->getValues());
             if ($id     = $object->{$object->getIdProperty()}) {
                 $query = $conn->createQueryBuilder();
@@ -88,14 +88,14 @@ class Doctrine implements BackendInterface
                     return;
                 }
                 throw new Exception('Object with id ' . $id . ' does not exist anymore.',
-                    Exception::NOT_EXISTS);
+                        Exception::NOT_EXISTS);
             }
 
             $conn->insert($table,
                 array_filter($values,
-                    function($value) {
-                    return !is_null($value);
-                }));
+                    function ($value) {
+                        return !is_null($value);
+                    }));
             $id = $conn->lastInsertId();
             $this->setProperty($object, $object->getIdProperty(), $id);
         });
@@ -106,7 +106,7 @@ class Doctrine implements BackendInterface
     private function getTableName($class)
     {
         $reflect = new ReflectionClass($class);
-        return snake_case($reflect->getShortName());
+        return Str::snake($reflect->getShortName());
     }
 
     private function setProperty(ObjectInterface $object, string $property, $value)
@@ -141,7 +141,7 @@ class Doctrine implements BackendInterface
     public function delete(ObjectInterface $object): BackendInterface
     {
         $table = $this->getTableName($object);
-        $this->conn->transactional(function(Connection $conn) use ($table, $object) {
+        $this->conn->transactional(function (Connection $conn) use ($table, $object) {
             if ($id = $object->{$object->getIdProperty()}) {
                 $query = $conn->createQueryBuilder();
                 $query->delete($table)

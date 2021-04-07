@@ -1,18 +1,21 @@
 <?php
 namespace Doctrine\DBAL\Migrations\Tests\Provider;
 
-use Doctrine\DBAL\Migrations\Tests\MigrationTestCase;
+use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\DriverManager;
 use Doctrine\DBAL\Schema\Schema;
+use Doctrine\Migrations\Tests\TestLogger;
 use Dryspell\Migrations\SchemaProvider;
 use Dryspell\Models\BaseObject;
-use function snake_case;
+use Illuminate\Support\Str;
+use PHPUnit\Framework\TestCase;
 
 /**
  * Tests the dryspell schema provider
  *
  * @author Björn Tantau <bjoern@bjoern-tantau.de>
  */
-class OrmSchemaProviderTest extends MigrationTestCase
+class OrmSchemaProviderTest extends TestCase
 {
 
     /**
@@ -50,8 +53,8 @@ class OrmSchemaProviderTest extends MigrationTestCase
 
         $to_schema = $provider->createSchema();
         $this->assertInstanceOf(Schema::class, $to_schema);
-        $this->assertTrue($to_schema->hasTable(snake_case(get_class($object))));
-        $table     = $to_schema->getTable(snake_case(get_class($object)));
+        $this->assertTrue($to_schema->hasTable(Str::snake(get_class($object))));
+        $table     = $to_schema->getTable(Str::snake(get_class($object)));
         $this->assertTrue($table->hasColumn('id'));
         $this->assertTrue($table->hasColumn('foo'));
         $this->assertTrue($table->hasColumn('foreign_id'));
@@ -64,6 +67,18 @@ class OrmSchemaProviderTest extends MigrationTestCase
         $this->assertEquals('CASCADE', array_values($table->getForeignKeys())[0]->onUpdate());
         $this->assertEquals('CASCADE', array_values($table->getForeignKeys())[1]->onDelete());
         $this->assertEquals('CASCADE', array_values($table->getForeignKeys())[1]->onUpdate());
+    }
+
+    public function getSqliteConnection(): Connection
+    {
+        $params = ['driver' => 'pdo_sqlite', 'memory' => true];
+
+        return DriverManager::getConnection($params);
+    }
+
+    public function getLogOutput(TestLogger $logger): string
+    {
+        return implode("\n", $logger->logs);
     }
 }
 

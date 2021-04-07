@@ -1,9 +1,12 @@
 <?php
 namespace Dryspell\Traits;
 
-use Dryspell\InvalidTypeException;
-use Dryspell\UndefinedPropertyException;
+use Dryspell\ExtendedReflectionClass;
+use Dryspell\Models\ObjectInterface;
+use Illuminate\Support\Str;
+use InvalidArgumentException;
 use phpDocumentor\Reflection\DocBlock\Tags\Property;
+use phpDocumentor\Reflection\DocBlockFactory;
 
 /**
  * Create properties from annotations.
@@ -49,9 +52,9 @@ trait AnnotationProperties
     {
         $properties = [];
 
-        $factory = \phpDocumentor\Reflection\DocBlockFactory::createInstance();
+        $factory = DocBlockFactory::createInstance();
 
-        $reflection  = new \Dryspell\ExtendedReflectionClass($this);
+        $reflection  = new ExtendedReflectionClass($this);
         $reflections = [];
         do {
             $reflections[] = $reflection;
@@ -70,7 +73,7 @@ trait AnnotationProperties
                     } else {
                         $namespaced_type = '\\' . $reflection->getNamespaceName() . $type;
                         $reflection->hasUseStatement($type);
-                        if (!starts_with('\\', $type) && class_exists($namespaced_type)) {
+                        if (!Str::startsWith('\\', $type) && class_exists($namespaced_type)) {
                             $type = $namespaced_type;
                         }
                     }
@@ -83,7 +86,7 @@ trait AnnotationProperties
                         $this->getOptions((string) $property->getDescription()));
                     $properties[$property->getVariableName()] = $options;
                 }
-            } catch (\InvalidArgumentException $e) {
+            } catch (InvalidArgumentException $e) {
                 // Ignore classes with invalid or missing docblocks.
                 continue;
             }
@@ -104,7 +107,7 @@ trait AnnotationProperties
         $regex   = '/@([a-z_]+)(\(([a-z0-9]+)\))?/i';
         if (preg_match_all($regex, $desc, $matches)) {
             foreach ($matches[1] as $i => $key) {
-                $key = snake_case($key);
+                $key = Str::snake($key);
                 if (isset($this->available_options[$key])) {
                     $value = $matches[3][$i];
                     switch ($key) {

@@ -49,7 +49,7 @@ class ObjectTest extends TestCase
             ],
             'child'      => [
                 'type'     => '\\' . ObjectTestClass::class,
-                'required' => false,
+                'required' => true,
             ],
         ];
         $this->assertEquals($expected, $actual);

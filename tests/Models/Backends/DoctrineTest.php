@@ -1,16 +1,16 @@
 <?php
 namespace Dryspell\Tests\Models\Backends;
 
+use DateTime;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Driver;
-use Doctrine\DBAL\Types\Type;
 use Dryspell\Models\Backends\Doctrine;
 use Dryspell\Models\Backends\Exception;
 use Dryspell\Models\BaseObject;
 use Generator;
+use Illuminate\Support\Str;
 use PDO;
 use PHPunit\Framework\TestCase;
-use function snake_case;
 
 /**
  * Tests for doctrine based backend model
@@ -52,15 +52,15 @@ class DoctrineTest extends TestCase
                         'type' => 'string',
                     ],
                     'created_at' => [
-                        'type' => \DateTime::class,
+                        'type' => DateTime::class,
                     ],
         ]));
         $object->foo        = 'bar';
-        $object->created_at = new \DateTime('2000-01-01');
+        $object->created_at = new DateTime('2000-01-01');
 
         $conn->expects($this->once())
             ->method('insert')
-            ->with(snake_case(get_class($object)), ['foo' => 'bar', 'created_at' => '2000-01-01 00:00:00']);
+            ->with(Str::snake(get_class($object)), ['foo' => 'bar', 'created_at' => '2000-01-01 00:00:00']);
         $conn->expects($this->once())
             ->method('lastInsertId')
             ->will($this->returnValue(1));
@@ -114,7 +114,7 @@ class DoctrineTest extends TestCase
             ->will($this->returnSelf());
         $query_builder->expects($this->once())
             ->method('from')
-            ->with(snake_case(get_class($object)))
+            ->with(Str::snake(get_class($object)))
             ->will($this->returnSelf());
         $query_builder->expects($this->once())
             ->method('where')
@@ -137,7 +137,7 @@ class DoctrineTest extends TestCase
             ->will($this->returnValue('`id`'));
         $conn->expects($this->once())
             ->method('update')
-            ->with(snake_case(get_class($object)), ['foo' => 'bar', 'id' => 1],
+            ->with(Str::snake(get_class($object)), ['foo' => 'bar', 'id' => 1],
                 ['id' => 1]);
 
         $backend->save($object);
@@ -148,11 +148,11 @@ class DoctrineTest extends TestCase
      * Is an exception thrown when trying to update a deleted object?
      *
      * @test
-     * @expectedException Exception
-     * @expectedExceptionCode 1
      */
     public function testSaveSeeminglyExisting()
     {
+        $this->expectException(Exception::class);
+        $this->expectExceptionCode(Exception::NOT_EXISTS);
         $conn        = $this->getMockBuilder(Connection::class)
             ->disableOriginalConstructor()
             ->setMethods(['createQueryBuilder', 'insert', 'lastInsertId', 'beginTransaction',
@@ -191,7 +191,7 @@ class DoctrineTest extends TestCase
             ->will($this->returnSelf());
         $query_builder->expects($this->once())
             ->method('from')
-            ->with(snake_case(get_class($object)))
+            ->with(Str::snake(get_class($object)))
             ->will($this->returnSelf());
         $query_builder->expects($this->once())
             ->method('where')
@@ -230,7 +230,7 @@ class DoctrineTest extends TestCase
         $query_builder = $this->createMock(\Doctrine\DBAL\Query\QueryBuilder::class);
         $query_builder->expects($this->once())
             ->method('delete')
-            ->with(snake_case(get_class($object)))
+            ->with(Str::snake(get_class($object)))
             ->will($this->returnSelf());
         $query_builder->expects($this->once())
             ->method('where')
@@ -302,7 +302,7 @@ class DoctrineTest extends TestCase
             ->will($this->returnSelf());
         $query_builder->expects($this->once())
             ->method('from')
-            ->with(snake_case(get_class($object)))
+            ->with(Str::snake(get_class($object)))
             ->will($this->returnSelf());
         $query_builder->expects($this->once())
             ->method('andWhere')
