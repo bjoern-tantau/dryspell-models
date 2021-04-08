@@ -1,5 +1,5 @@
 <?php
-namespace Doctrine\DBAL\Migrations\Tests\Provider;
+namespace Dryspell\Tests\Migrations;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\DriverManager;

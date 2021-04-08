@@ -1,7 +1,9 @@
 <?php
 namespace Dryspell\Console\Commands;
 
-use Doctrine\DBAL\Migrations\Tools\Console\Command\DiffCommand as DoctrineDiffCommand;
+use Doctrine\Migrations\DependencyFactory;
+use Doctrine\Migrations\Tools\Console\Command\DiffCommand as DoctrineDiffCommand;
+use Doctrine\Migrations\Tools\Console\Command\DoctrineCommand;
 use Dryspell\Migrations\SchemaProvider;
 use Dryspell\Models\ObjectInterface;
 use hanneskod\classtools\Iterator\ClassIterator;
@@ -22,21 +24,11 @@ use Symfony\Component\Finder\Finder;
  * @since   2.0
  * @author  Jonathan Wage <jonwage@gmail.com>
  */
-class DiffCommand extends DoctrineDiffCommand
+class DiffCommand extends DoctrineCommand
 {
 
-    /**
-     *
-     * @var Finder
-     */
-    private $finder;
-
-    /**
-     * Container to construct objects with
-     *
-     * @var ContainerInterface
-     */
-    private $container;
+    /** @var string */
+    protected static $defaultName = 'migrations:diff';
 
     /**
      * Forcing Dryspell's SchemaProvider
@@ -44,27 +36,41 @@ class DiffCommand extends DoctrineDiffCommand
      * @param SchemaProvider $schemaProvider
      * @param Finder $finder
      */
-    public function __construct(SchemaProvider $schemaProvider, Finder $finder, ContainerInterface $container)
+    public function __construct(private Finder $finder, private ContainerInterface $container,
+                                private DoctrineDiffCommand $doctrineDiff, ?DependencyFactory $dependencyFactory = null,
+                                ?string $name = null)
     {
-        $this->finder    = $finder;
-        $this->container = $container;
-        parent::__construct($schemaProvider);
+        parent::__construct($dependencyFactory, $name);
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         parent::configure();
 
+        $this->setAliases($this->doctrineDiff->getAliases())
+            ->setDescription($this->doctrineDiff->getDescription())
+            ->setHelp($this->doctrineDiff->getHelp())
+        ;
+        $this->getDefinition()->addArguments($this->doctrineDiff->getDefinition()->getArguments());
+        $this->getDefinition()->addOptions($this->doctrineDiff->getDefinition()->getOptions());
+
         $this
-            ->addArgument('models-path', InputArgument::REQUIRED, 'Directory, containing all models to generate migrations for.')
+            ->addOption('models-path', null, InputOption::VALUE_REQUIRED, 'Directory, containing all models to generate migrations for.', 'src')
             ->addOption('models-namespace', null, InputOption::VALUE_REQUIRED, 'Namespace, containing all models to generate migrations for.')
             ->addOption('models-interface', null, InputOption::VALUE_REQUIRED, 'Interface, all models implement that should be migrations generated for.', ObjectInterface::class)
         ;
+
+        $this->doctrineDiff
+            ->addArgument('migrations:diff')
+            ->addOption('models-namespace')
+            ->addOption('models-interface')
+            ->addOption('models-path')
+        ;
     }
 
-    public function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $classes = new ClassIterator($this->finder->in($input->getArgument('models-path')));
+        $classes = new ClassIterator($this->finder->in($input->getOption('models-path')));
         if ($input->hasOption('models-namespace')) {
             $classes = $classes->inNamespace($input->getOption('models-namespace'));
         }
@@ -72,10 +78,16 @@ class DiffCommand extends DoctrineDiffCommand
             /* @var $class ReflectionClass */
             if ($class->isInstantiable()) {
                 $object = $this->container->get($class->getName());
-                $this->schemaProvider->addObject($object);
+                $this->getDependencyFactory()->getSchemaProvider()->addObject($object);
             }
         }
 
-        return parent::execute($input, $output);
+        $reflector     = new \ReflectionObject($this->doctrineDiff);
+        $ioProperty    = $reflector->getProperty('io');
+        $ioProperty->setAccessible(true);
+        $ioProperty->setValue($this->doctrineDiff, $this->io);
+        $executeMethod = $reflector->getMethod('execute');
+        $executeMethod->setAccessible(true);
+        return $executeMethod->invoke($this->doctrineDiff, $input, $output);
     }
 }

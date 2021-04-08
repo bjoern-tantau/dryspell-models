@@ -14,7 +14,7 @@ use JsonSerializable;
  * @property DateTime $created_at Time and date of creation. @default(now)
  * @property DateTime $updated_at Time and date of last update. @default(now), @OnUpdate(now)
  */
-abstract class BaseObject implements ObjectInterface, JsonSerializable
+class BaseObject implements ObjectInterface, JsonSerializable
 {
 
     use AnnotationProperties;

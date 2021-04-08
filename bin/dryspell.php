@@ -1,10 +1,10 @@
 <?php
 
-use Doctrine\DBAL\Migrations\Tools\Console\Command\ExecuteCommand;
-use Doctrine\DBAL\Migrations\Tools\Console\Command\GenerateCommand;
-use Doctrine\DBAL\Migrations\Tools\Console\Command\MigrateCommand;
-use Doctrine\DBAL\Migrations\Tools\Console\Command\StatusCommand;
-use Doctrine\DBAL\Migrations\Tools\Console\Command\VersionCommand;
+use Doctrine\Migrations\Tools\Console\Command\ExecuteCommand;
+use Doctrine\Migrations\Tools\Console\Command\GenerateCommand;
+use Doctrine\Migrations\Tools\Console\Command\MigrateCommand;
+use Doctrine\Migrations\Tools\Console\Command\StatusCommand;
+use Doctrine\Migrations\Tools\Console\Command\VersionCommand;
 use Dryspell\Console\Application;
 use Dryspell\Console\Commands\DiffCommand;
 use Dryspell\Migrations\Exception;
