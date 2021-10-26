@@ -180,6 +180,10 @@ class BaseObject implements ObjectInterface, JsonSerializable
                 $attributeProperty = new Options();
             }
             $attributeProperty->type = $property->getType() ?: $attributeProperty->type;
+            if (str_starts_with($attributeProperty->type, '?')) {
+                $attributeProperty->nullable = $attributeProperty->nullable ?? true;
+                $attributeProperty->type     = substr($attributeProperty->type, 1);
+            }
             if (class_exists($attributeProperty->type) && !str_starts_with($attributeProperty->type, '\\')) {
                 $attributeProperty->type = '\\' . $attributeProperty->type;
             }

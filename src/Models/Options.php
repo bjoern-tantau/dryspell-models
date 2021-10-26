@@ -20,7 +20,7 @@ class Options
      * @param bool $required Whether the property is required.
      * @param type $default The properties default value.
      *                      Use "now" for DateTime properties.
-     * @param bool $nullable Whether the property is nullable. Will usually not be set in the attribute.
+     * @param bool|null $nullable Whether the property is nullable. Will usually not be set in the attribute.
      * @param int|null $length The maximum length of the property value.
      * @param bool $generatedValue Whether the value of the property is generated.
      * @param bool $id Whether the property is used as an identifier.
@@ -35,7 +35,7 @@ class Options
      */
     public function __construct(
         public ?string $type = null, public bool $required = false, public $default = null,
-        public bool $nullable = false, public ?int $length = null, public bool $generatedValue = false,
+        public ?bool $nullable = null, public ?int $length = null, public bool $generatedValue = false,
         public bool $id = false, public bool $signed = true, public ?string $onUpdate = null,
         public ?string $onDelete = null, public bool $searchable = false, public bool $unique = false
     )

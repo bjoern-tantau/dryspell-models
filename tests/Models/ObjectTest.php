@@ -31,6 +31,7 @@ class ObjectTest extends TestCase
             'created_at' => new Options(type: '\\DateTime', default: 'now'),
             'updated_at' => new Options(type: '\\DateTime', default: 'now', onUpdate: 'now'),
             'child'      => new Options(type: '\\' . ObjectTestClass::class),
+            'nullable'   => new Options(type: 'string', nullable: true),
         ];
         $this->assertEquals($expected, $actual);
     }
@@ -149,5 +150,6 @@ class ObjectTestClass extends BaseObject
 {
 
     public ObjectTestClass $child;
+    public ?string $nullable;
 
 }
