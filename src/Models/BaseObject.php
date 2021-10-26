@@ -2,7 +2,8 @@
 namespace Dryspell\Models;
 
 use DateTime;
-use Dryspell\Traits\AnnotationProperties;
+use DateTimeZone;
+use Dryspell\InvalidTypeException;
 use JsonSerializable;
 
 /**
@@ -17,33 +18,17 @@ use JsonSerializable;
 class BaseObject implements ObjectInterface, JsonSerializable
 {
 
-    use AnnotationProperties;
+    #[Options(id: true, generatedValue: true, signed: false)]
+    public int $id;
+
+    #[Options(default: 'now')]
+    public \DateTime $created_at;
+
+    #[Options(default: 'now', onUpdate: 'now')]
+    public \DateTime $updated_at;
 
     /** @var string Property to be used as id of object. */
     protected static $id_property = 'id';
-
-    /** @var BackendInterface Data-Managing Backend. */
-    private $backend;
-
-    /**
-     * Currently selected key in the iteration
-     *
-     * @var integer
-     */
-    private $current = 0;
-
-    /**
-     * Keys to iterate over
-     *
-     * @var array
-     */
-    private $keys = [];
-
-    public function __construct(BackendInterface $backend)
-    {
-        $this->backend = $backend;
-        $this->keys    = array_keys($this->getProperties());
-    }
 
     /**
      * Returns the name of the identifier property.
@@ -53,57 +38,6 @@ class BaseObject implements ObjectInterface, JsonSerializable
     public static function getIdProperty(): string
     {
         return static::$id_property;
-    }
-
-    /**
-     * Save data via the backend.
-     *
-     * @return BaseObject
-     */
-    public function save(): ObjectInterface
-    {
-        $this->backend->save($this);
-        return $this;
-    }
-
-    /**
-     * Remove the object via the backend.
-     *
-     * @return ObjectInterface
-     */
-    public function delete(): ObjectInterface
-    {
-        $this->backend->delete($this);
-        return $this;
-    }
-
-    /**
-     * Find many instances of the object with the given criteria.
-     *
-     * @param int|string|array $term Integer or string searches for the objects id.
-     * Array searches for the given property key with the given value.
-     * @return BaseObject[]
-     */
-    public function find($term = null): iterable
-    {
-        foreach ($this->backend->find($this, $term) as $object) {
-            yield $object;
-        }
-    }
-
-    /**
-     * Find one instance of the object with the given criteria.
-     *
-     * @param int|string $id Id of the desired object.
-     * Array searches for the given property key with the given value.
-     * @return BaseObject
-     */
-    public function load($id): ObjectInterface
-    {
-        foreach ($this->backend->find($this, [$this->getIdProperty() => $id]) as $values) {
-            return $this->setValues($values);
-        }
-        return $this;
     }
 
     /**
@@ -138,7 +72,7 @@ class BaseObject implements ObjectInterface, JsonSerializable
         return $this;
     }
 
-    public function setWeaklyTyped(string $name, $value): \Dryspell\Models\ObjectInterface
+    public function setWeaklyTyped(string $name, $value): ObjectInterface
     {
         $properties = $this->getProperties();
         if (!isset($properties[$name])) {
@@ -146,62 +80,6 @@ class BaseObject implements ObjectInterface, JsonSerializable
         }
         $this->$name = $this->convertValueForProperty($name, $value);
         return $this;
-    }
-
-    /**
-     * (PHP 5 >= 5.0.0, PHP 7)<br/>
-     * Return the current element
-     * @link http://php.net/manual/en/iterator.current.php
-     * @return mixed Can return any type.
-     */
-    public function current()
-    {
-        return $this->{$this->keys[$this->current]};
-    }
-
-    /**
-     * (PHP 5 >= 5.0.0, PHP 7)<br/>
-     * Return the key of the current element
-     * @link http://php.net/manual/en/iterator.key.php
-     * @return scalar scalar on success, or <b>NULL</b> on failure.
-     */
-    public function key()
-    {
-        return $this->keys[$this->current];
-    }
-
-    /**
-     * (PHP 5 >= 5.0.0, PHP 7)<br/>
-     * Move forward to next element
-     * @link http://php.net/manual/en/iterator.next.php
-     * @return void Any returned value is ignored.
-     */
-    public function next(): void
-    {
-        $this->current++;
-    }
-
-    /**
-     * (PHP 5 >= 5.0.0, PHP 7)<br/>
-     * Rewind the Iterator to the first element
-     * @link http://php.net/manual/en/iterator.rewind.php
-     * @return void Any returned value is ignored.
-     */
-    public function rewind(): void
-    {
-        $this->current = 0;
-    }
-
-    /**
-     * (PHP 5 >= 5.0.0, PHP 7)<br/>
-     * Checks if current position is valid
-     * @link http://php.net/manual/en/iterator.valid.php
-     * @return boolean The return value will be casted to boolean and then evaluated.
-     * Returns <b>TRUE</b> on success or <b>FALSE</b> on failure.
-     */
-    public function valid(): bool
-    {
-        return isset($this->keys[$this->current]);
     }
 
     /**
@@ -231,7 +109,7 @@ class BaseObject implements ObjectInterface, JsonSerializable
             $name = preg_replace('/_id$/', '', $name);
         }
         $options = $properties[$name];
-        switch ($options['type']) {
+        switch ($options->type) {
             case 'bool':
             case 'boolean':
                 $value = boolval($value);
@@ -262,7 +140,7 @@ class BaseObject implements ObjectInterface, JsonSerializable
                     }
                     $date = new \DateTime($value['date']);
                     if (isset($value['timezone'])) {
-                        $timezone = new \DateTimeZone($value['timezone']);
+                        $timezone = new DateTimeZone($value['timezone']);
                         $date->setTimezone($timezone);
                     }
                     $value = $date;
@@ -271,16 +149,42 @@ class BaseObject implements ObjectInterface, JsonSerializable
                 }
                 break;
             default:
-                if (is_a($options['type'], self::class, true)) {
+                if (is_a($options->type, self::class, true)) {
                     /* @var $object BaseObject */
-                    $object     = new $options['type']($this->backend);
+                    $object                             = new $options->type();
                     $object->{$object->getIdProperty()} = $value;
-                    $value = $object;
+                    $value                              = $object;
                 } else {
-                    $value = new $options['type']($value);
+                    $value = new $options->type($value);
                 }
                 break;
         }
         return $value;
+    }
+
+    /**
+     *
+     * @return Options[]
+     */
+    public function getProperties(): array
+    {
+        $reflection = new \ReflectionObject($this);
+        $properties = [];
+        /* @var $property \ReflectionProperty */
+        foreach ($reflection->getProperties(\ReflectionProperty::IS_PUBLIC) as $property) {
+            /* @var $attribute \ReflectionAttribute */
+            $attribute = $property->getAttributes(Options::class)[0] ?? null;
+            if (isset($attribute)) {
+                $attributeProperty = $attribute->newInstance();
+            } else {
+                $attributeProperty = new Options();
+            }
+            $attributeProperty->type = $property->getType() ?: $attributeProperty->type;
+            if (class_exists($attributeProperty->type) && !str_starts_with($attributeProperty->type, '\\')) {
+                $attributeProperty->type = '\\' . $attributeProperty->type;
+            }
+            $properties[$property->getName()] = $attributeProperty;
+        }
+        return $properties;
     }
 }
