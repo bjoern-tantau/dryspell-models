@@ -49,7 +49,10 @@ class BaseObject implements ObjectInterface, JsonSerializable
     {
         $values = [];
         foreach ($this->getProperties() as $property => $options) {
-            $values[$property] = $this->$property;
+            $ref = new \ReflectionProperty($this, $property);
+            if ($ref->isInitialized($this)) {
+                $values[$property] = $this->$property;
+            }
         }
         return $values;
     }

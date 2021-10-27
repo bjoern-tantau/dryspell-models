@@ -69,6 +69,24 @@ class ObjectTest extends TestCase
     }
 
     /**
+     * Are unset values left out?
+     *
+     * @test
+     */
+    public function testGetIncompleteValues()
+    {
+        $values = [
+            'created_at' => new DateTime('2000-01-01'),
+            'updated_at' => new DateTime('2000-01-01'),
+        ];
+
+        $object = $this->getMockForAbstractClass(BaseObject::class);
+        $object->setValues($values);
+        $actual = $object->getValues();
+        $this->assertEquals($values, $actual);
+    }
+
+    /**
      * Are values correctly assigned to properties?
      *
      * @test
