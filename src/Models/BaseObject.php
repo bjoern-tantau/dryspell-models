@@ -107,6 +107,10 @@ class BaseObject implements ObjectInterface, JsonSerializable
      */
     private function convertValueForProperty(string $name, $value)
     {
+        if (is_null($value)) {
+            return $value;
+        }
+
         $properties = $this->getProperties();
         if (!isset($properties[$name])) {
             $name = preg_replace('/_id$/', '', $name);
@@ -133,7 +137,9 @@ class BaseObject implements ObjectInterface, JsonSerializable
                 }
                 break;
             case '\\' . \DateTime::class:
-                if (is_numeric($value)) {
+                if ($value instanceof DateTime) {
+                    $value = $value;
+                } elseif (is_numeric($value)) {
                     $date  = new \DateTime();
                     $date->setTimestamp($value);
                     $value = $date;
@@ -152,8 +158,10 @@ class BaseObject implements ObjectInterface, JsonSerializable
                 }
                 break;
             default:
-                if (is_a($options->type, self::class, true)) {
-                    /* @var $object BaseObject */
+                if (is_a($value, $options->type, false)) {
+                    $value = $value;
+                } elseif (is_subclass_of($options->type, ObjectInterface::class)) {
+                    /* @var $object ObjectInterface */
                     $object                             = new $options->type();
                     $object->{$object->getIdProperty()} = $value;
                     $value                              = $object;
