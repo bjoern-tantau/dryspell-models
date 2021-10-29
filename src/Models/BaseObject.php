@@ -162,9 +162,9 @@ class BaseObject implements ObjectInterface, JsonSerializable
                     $value = $value;
                 } elseif (is_subclass_of($options->type, ObjectInterface::class)) {
                     /* @var $object ObjectInterface */
-                    $object                             = new $options->type();
-                    $object->{$object->getIdProperty()} = $value;
-                    $value                              = $object;
+                    $object = new $options->type();
+                    $object->setWeaklyTyped($object->getIdProperty(), $value);
+                    $value  = $object;
                 } else {
                     $value = new $options->type($value);
                 }
