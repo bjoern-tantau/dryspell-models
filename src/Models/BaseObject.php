@@ -158,7 +158,9 @@ class BaseObject implements ObjectInterface, JsonSerializable
                 }
                 break;
             default:
-                if (is_a($value, $options->type, false)) {
+                if (empty($value)) {
+                    $value = null;
+                } elseif (is_a($value, $options->type, false)) {
                     $value = $value;
                 } elseif (is_subclass_of($options->type, ObjectInterface::class)) {
                     /* @var $object ObjectInterface */
