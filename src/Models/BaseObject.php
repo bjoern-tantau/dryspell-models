@@ -90,9 +90,9 @@ class BaseObject implements ObjectInterface, JsonSerializable
      * <p>Serializes the object to a value that can be serialized natively by <code>json_encode()</code>.</p>
      * @return mixed <p>Returns data which can be serialized by <code>json_encode()</code>, which is a value of any type other than a <code>resource</code>.</p>
      * @link http://php.net/manual/en/jsonserializable.jsonserialize.php
-     * @since PHP 5 >= 5.4.0, PHP 7
+     * @since PHP 5 >= 5.4.0, PHP 7, PHP 8
      */
-    public function jsonSerialize()
+    public function jsonSerialize(): mixed
     {
         return $this->getValues();
     }
