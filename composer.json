@@ -1,7 +1,7 @@
 {
     "name": "dryspell/models",
     "description": "PHP models framework, using typed properties.",
-    "version": "2.1.6",
+    "version": "2.1.7",
     "authors": [
         {
             "name": "Björn Tantau",
